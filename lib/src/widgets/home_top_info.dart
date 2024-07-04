@@ -19,8 +19,8 @@ class HomeTopInfo extends StatelessWidget {
               Text('Fellow Foodie', style: textStyle),
             ],
           ),
-          Icon(Icons.notifications_none,
-              size: 30.0, color: Theme.of(context).primaryColor),
+          Icon(Icons.handshake,
+              size: 40.0, color: Theme.of(context).primaryColor),
         ],
       ),
     );

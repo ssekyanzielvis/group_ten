@@ -38,4 +38,11 @@ flutter:
     - lib/assets/images/chicken favourite.jpg
     - lib/assets/images/chips chicken salads.jfif
     - lib/assets/images/chapati.jfif
+    - android/app/src/main/res/mipmap-hdpi/foodddassh.png
+    - ios/Runner/Assets.xcassets/AppIcon.appiconset/_/120.png
+    - android/app/src/main/res/mipmap-hdpi/foodddassh.png
+    - android/app/src/main/res/mipmap-mdpi/foodddassh.png
+    - android/app/src/main/res/mipmap-xhdpi/foodddassh.png
+    - android/app/src/main/res/mipmap-xxxhdpi/foodddassh.png
+
 
