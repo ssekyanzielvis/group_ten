@@ -44,5 +44,6 @@ flutter:
     - android/app/src/main/res/mipmap-mdpi/foodddassh.png
     - android/app/src/main/res/mipmap-xhdpi/foodddassh.png
     - android/app/src/main/res/mipmap-xxxhdpi/foodddassh.png
+    - lib/assets/images/all favourites ice cream.jfif
 
 

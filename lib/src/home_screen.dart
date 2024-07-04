@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:food_dash/src/widgets/food_category.dart';
 import 'widgets/home_top_info.dart';
+import 'widgets/search_field.dart';
+import 'widgets/bought_foods.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,21 +22,35 @@ class _HomeScreenState extends State<HomeScreen> {
         children: <Widget>[
           HomeTopInfo(),
           FoodCategory(),
+          SizedBox(height: 20),
+          SearchField(),
+          SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('What are you gonna Eat?', style: textStyle),
-                  Text('Choose your favorite food', style: textStyle),
-                ],
+              Text(
+                "Frequently Bought Foods.",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              Icon(Icons.notifications_none,
-                  size: 30.0, color: Theme.of(context).primaryColor),
+              GestureDetector(
+                onTap: () {},
+                child: Text(
+                  "View All",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue,
+                  ),
+                ),
+              ),
             ],
           ),
+          Container(
+            child: BoughtFoods(),
+          )
         ],
       ),
     );
