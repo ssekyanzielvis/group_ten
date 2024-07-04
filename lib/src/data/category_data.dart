@@ -26,8 +26,8 @@ final categories = [
   ),
   Category(
     numberOfItems: 5,
-    imagePath: "lib/assets/images/pilau beef.jpg",
-    categoryName: "Full package",
+    imagePath: "lib/assets/images/vegetable chicken.jpg",
+    categoryName: "Vegetables++",
   ),
   Category(
     numberOfItems: 5,

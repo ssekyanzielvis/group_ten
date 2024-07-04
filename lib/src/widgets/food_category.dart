@@ -9,7 +9,7 @@ class FoodCategory extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 70.0,
+      height: 80.0,
       child: ListView.builder(
           scrollDirection: Axis.horizontal,
           itemCount: _categories.length,
