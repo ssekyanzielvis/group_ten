@@ -1,2 +1,6 @@
 import 'package:flutter/material.dart';
-//import 'src';
+import 'package:food_dash/src/app.dart';
+
+void main() {
+  runApp(App());
+}
