@@ -17,3 +17,26 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - lib/assets/images/burger.jpg
+    - lib/assets/images/burger combo+ drinks.jpg
+    - lib/assets/images/posho+fish.jpg
+    - lib/assets/images/vegetable chicken.jpg
+    - lib/assets/images/vegetable noodles.jpg
+    - lib/assets/images/snacks.jpg
+    - lib/assets/images/youghut.jfif
+    - lib/assets/images/rolex.jfif
+    - lib/assets/images/paste gnuts.jfif
+    - lib/assets/images/pilau beef lusania.jpg
+    - lib/assets/images/chips+fish.jfif
+    - lib/assets/images/casava chips.jpg
+    - lib/assets/images/pineapple juice.jfif
+    - lib/assets/images/sausagevip.jpg
+    - lib/assets/images/pizza combo.jpg
+    - lib/assets/images/pilau+fish.jpg
+    - lib/assets/images/chicken favourite.jpg
+    - lib/assets/images/chips chicken salads.jfif
+    - lib/assets/images/chapati.jfif
+    - lib/assets/images/food collection.jpg
+    - lib/assets/images/pilau beef.jpg

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:food_dash/src/widgets/food_category.dart';
+import 'widgets/home_top_info.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,7 +17,9 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: ListView(
         padding: EdgeInsets.only(top: 40, left: 20, right: 20),
-        children: [
+        children: <Widget>[
+          HomeTopInfo(),
+          FoodCategory(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
