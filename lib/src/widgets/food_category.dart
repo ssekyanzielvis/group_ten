@@ -11,6 +11,8 @@ class FoodCategory extends StatelessWidget {
     return ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: _categories.length,
-        itemBuilder: (BuildContext context, int index) {});
+        itemBuilder: (BuildContext context, int index) {
+          return FoodCard();
+        });
   }
 }
