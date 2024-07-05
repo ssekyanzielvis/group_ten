@@ -6,16 +6,16 @@ import 'package:food_dash/src/widgets/bought_foods.dart';
 import 'package:food_dash/src/data/food_data.dart';
 
 import 'package:food_dash/src/models/background.dart';
-import 'models/food_model.dart'; // Updated import
+import '../models/food_model.dart'; // Updated import
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomePageState extends State<HomePage> {
   List<Food> _foods = foods; // Ensure foods is defined and imported
 
   @override
