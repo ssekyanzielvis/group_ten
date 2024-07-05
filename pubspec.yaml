@@ -38,12 +38,13 @@ flutter:
     - lib/assets/images/chicken favourite.jpg
     - lib/assets/images/chips chicken salads.jfif
     - lib/assets/images/chapati.jfif
-    - android/app/src/main/res/mipmap-hdpi/foodddassh.png
-    - ios/Runner/Assets.xcassets/AppIcon.appiconset/_/120.png
-    - android/app/src/main/res/mipmap-hdpi/foodddassh.png
-    - android/app/src/main/res/mipmap-mdpi/foodddassh.png
-    - android/app/src/main/res/mipmap-xhdpi/foodddassh.png
-    - android/app/src/main/res/mipmap-xxxhdpi/foodddassh.png
     - lib/assets/images/all favourites ice cream.jfif
+    - lib/assets/images/pilau+beef.jpg
+    - lib/assets/images/sausage breakfast.jpg
+    - lib/assets/images/youghut tinned.jfif
+    - lib/assets/images/EggRoll.jpg
+    - lib/assets/images/chapatifestival.jpg
+    - lib/assets/images/rolex.jfif
+    - lib/assets/images/chips+chicken.jpg
 
-
+  # No need to specify app icons here, they are automatically picked from the res directories
