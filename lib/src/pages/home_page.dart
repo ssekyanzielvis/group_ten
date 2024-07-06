@@ -6,7 +6,8 @@ import 'package:food_dash/src/widgets/bought_foods.dart';
 import 'package:food_dash/src/data/food_data.dart';
 
 import 'package:food_dash/src/models/background.dart';
-import '../models/food_model.dart'; // Updated import
+import '../models/food_model.dart';
+import '../models/cart_item.dart'; // Updated import
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,7 +17,14 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<Food> _foods = foods; // Ensure foods is defined and imported
+  List<Food> _foods = foods;
+  List<CartItem> _cartItems = [];
+
+  void _addToCart(CartItem item) {
+    setState(() {
+      _cartItems.add(item);
+    });
+  } // Ensure foods is defined and imported
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +35,7 @@ class _HomePageState extends State<HomePage> {
           padding: EdgeInsets.only(top: 40, left: 20, right: 20),
           children: <Widget>[
             HomeTopInfo(),
-            FoodCategory(),
+            FoodCategory(onAddToCart: _addToCart),
             SizedBox(height: 20),
             SearchField(),
             SizedBox(height: 20),

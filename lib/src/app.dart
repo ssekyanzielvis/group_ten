@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 //import 'home_screen.dart';
 import 'screens/main_screen.dart';
+import 'widgets/responsive.dart';
+//import 'widgets/layout.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -13,7 +15,11 @@ class App extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MainScreen(),
+      home: Responsive(
+        mobile: MainScreen(),
+        tablet: MainScreen(),
+        desktop: MainScreen(),
+      ),
     );
   }
 }

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../pages/home_page.dart';
+import '../pages/order_page.dart';
+import '../pages/favourite_page.dart';
+import '../pages/profile_page.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -16,13 +19,22 @@ class _MainScreenState extends State<MainScreen> {
   Widget currentPage = HomePage();
 
   HomePage homePage = HomePage();
+  OrderPage orderPage = OrderPage();
+  FavoritesPage favouritePage = FavoritesPage();
+  ProfilePage profilePage = ProfilePage();
 
   @override
   void initState() {
     super.initState();
     homePage = HomePage();
+    orderPage = OrderPage();
+    favouritePage = FavoritesPage();
+    profilePage = ProfilePage();
     pages = [
       homePage,
+      orderPage,
+      favouritePage,
+      profilePage,
     ];
     currentPage = pages[
         0]; // Initialize currentPage with the first page in the pages list
