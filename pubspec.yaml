@@ -84,4 +84,7 @@ flutter:
     - lib/assets/images/chips+chicken.jpg
     - lib/assets/images/chips chicken salads.jfif
     - lib/assets/images/profile.jpg
+    - lib/assets/images/barnerr.jpg
+    - lib/assets/images/chicken.jpg
+    - lib/assets/images/meal.jpg
   # No need to specify app icons here, they are automatically picked from the res directories
