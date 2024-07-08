@@ -53,7 +53,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   width: 20.0,
                 ),
                 Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
                       "Nancy",
@@ -91,11 +91,75 @@ class _ProfilePageState extends State<ProfilePage> {
                               fontWeight: FontWeight.w400),
                         ),
                       ),
-                    )
+                    ),
                   ],
-                )
+                ),
               ],
-            )
+            ),
+            SizedBox(
+              height: 20.0,
+            ),
+            Text(
+              "Account",
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Card(
+              elevation: 1.0,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.0),
+                child: Column(
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Icon(Icons.location_on, color: Colors.blue),
+                        SizedBox(width: 10),
+                        Text("Location"),
+                      ],
+                    ),
+                    Divider(
+                      height: 10,
+                      color: Colors.grey,
+                      indent: 20.0,
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Icon(Icons.visibility, color: Colors.blue),
+                        SizedBox(width: 10),
+                        Text("Change Password"),
+                      ],
+                    ),
+                    Divider(
+                      height: 10,
+                      color: Colors.grey,
+                      indent: 20.0,
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Icon(Icons.shopping_bag, color: Colors.blue),
+                        SizedBox(width: 10),
+                        Text("Shipping"),
+                      ],
+                    ),
+                    Divider(
+                      height: 10,
+                      color: Colors.grey,
+                      indent: 20.0,
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Icon(Icons.paypal, color: Colors.blue),
+                        SizedBox(width: 10),
+                        Text("Payment"),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
