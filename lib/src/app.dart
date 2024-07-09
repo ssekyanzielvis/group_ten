@@ -1,7 +1,7 @@
-/*import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../widgets/widget_tree.dart';
+import 'widgets/widget_tree.dart';
 
 import 'screens/main_screen.dart';
 //import 'screens/cart_screen.dart';
@@ -25,7 +25,7 @@ class App extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: AuthWrapper(),
+      home: WidgetTree(),
     );
   }
 }
@@ -47,9 +47,9 @@ class AuthWrapper extends StatelessWidget {
       },
     );
   }
-}*/
+}
 
-import 'package:flutter/material.dart';
+/*import 'package:flutter/material.dart';
 import 'screens/main_screen.dart';
 // Import your home page widget here
 
@@ -69,4 +69,4 @@ class MyApp extends StatelessWidget {
       home: MainScreen(), // Set your home page widget here
     );
   }
-}
+}*/
