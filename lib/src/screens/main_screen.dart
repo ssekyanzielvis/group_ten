@@ -4,6 +4,7 @@ import '../pages/home_page.dart';
 import '../pages/order_page.dart';
 import '../pages/favourite_page.dart';
 import '../pages/profile_page.dart';
+import '../widgets/auth_service.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -42,6 +43,17 @@ class _MainScreenState extends State<MainScreen> {
 
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Food Dash'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout),
+            onPressed: () async {
+              await AuthService().signOut();
+            },
+          ),
+        ],
+      ),
       bottomNavigationBar: BottomNavigationBar(
         onTap: (int index) {
           setState(() {

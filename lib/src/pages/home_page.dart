@@ -1,88 +1,249 @@
 import 'package:flutter/material.dart';
-import 'package:food_dash/src/widgets/food_category.dart';
-import 'package:food_dash/src/widgets/home_top_info.dart';
-import 'package:food_dash/src/widgets/search_field.dart';
-import 'package:food_dash/src/widgets/bought_foods.dart';
-import 'package:food_dash/src/data/food_data.dart';
-
-import 'package:food_dash/src/models/background.dart';
-import '../models/food_model.dart';
-import '../models/cart_item.dart'; // Updated import
+import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
-
   @override
-  State<HomePage> createState() => _HomePageState();
+  _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  List<Food> _foods = foods;
-  List<CartItem> _cartItems = [];
+  String selectedMeal = '';
+  double budget = 0.0;
+  String dietRecommendation = 'Eat balanced meals!';
+  List<dynamic> nearbyRestaurants = [];
 
-  void _addToCart(CartItem item) {
+  final TextEditingController _budgetController = TextEditingController();
+
+  void _setMealType(String meal) {
     setState(() {
-      _cartItems.add(item);
+      selectedMeal = meal;
     });
-  } // Ensure foods is defined and imported
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Background(
-        // Use Background widget here
-        child: ListView(
-          padding: EdgeInsets.only(top: 40, left: 20, right: 20),
-          children: <Widget>[
-            HomeTopInfo(),
-            FoodCategory(onAddToCart: _addToCart),
-            SizedBox(height: 20),
-            SearchField(),
-            SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Frequently Bought Foods.",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {},
-                  child: Text(
-                    "View All",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 20.0),
-            Column(
-              children: _foods.map(_buildFoodItems).toList(),
+  void _submitBudget() {
+    setState(() {
+      budget = double.tryParse(_budgetController.text) ?? 0.0;
+    });
+  }
+
+  Future<void> _findNearbyRestaurants() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      final url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
+          '?location=${position.latitude},${position.longitude}'
+          '&radius=1500'
+          '&type=restaurant'
+          '&key=YOUR_GOOGLE_PLACES_API_KEY';
+
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        setState(() {
+          nearbyRestaurants = json.decode(response.body)['results'];
+        });
+      } else {
+        print('Failed to load nearby restaurants');
+      }
+    } catch (e) {
+      print('Error fetching location: $e');
+    }
+  }
+
+  void _makeOrder() {
+    if (selectedMeal.isEmpty || budget <= 0 || nearbyRestaurants.isEmpty) {
+      // Display an alert if any required input is missing
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Error'),
+          content: Text(
+              'Please select a meal type, enter a budget, and find nearby restaurants.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('OK'),
             ),
           ],
+        ),
+      );
+      return;
+    }
+
+    // Navigate to order confirmation screen
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => OrderConfirmationScreen(
+          mealType: selectedMeal,
+          budget: budget,
+          restaurant: nearbyRestaurants.first['name'],
+          dietRecommendation: dietRecommendation,
         ),
       ),
     );
   }
 
-  Widget _buildFoodItems(Food food) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 20.0),
-      child: BoughtFoods(
-        id: food.id,
-        name: food.name,
-        imagePath: food.imagePath,
-        category: food.category,
-        discount: food.discount,
-        price: food.price,
-        ratings: food.ratings,
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Welcome To Food Dash',
+            style: TextStyle(
+                color: Colors.blue, fontSize: 30, fontWeight: FontWeight.bold)),
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Choose a meal type:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  ElevatedButton(
+                    onPressed: () => _setMealType('Breakfast'),
+                    child: Text('Breakfast'),
+                  ),
+                  SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => _setMealType('Lunch'),
+                    child: Text('Lunch'),
+                  ),
+                  SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => _setMealType('Dinner'),
+                    child: Text('Dinner'),
+                  ),
+                  SizedBox(height: 16),
+                ],
+              ),
+              SizedBox(height: 20),
+              Text(
+                'Enter your budget:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              TextField(
+                controller: _budgetController,
+                decoration: InputDecoration(labelText: 'Budget'),
+                keyboardType: TextInputType.number,
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  _submitBudget();
+                  _findNearbyRestaurants();
+                },
+                child: Text('Submit Budget'),
+              ),
+              SizedBox(height: 20),
+              Text(
+                'Diet Recommendation:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              Text(
+                dietRecommendation,
+                style: TextStyle(fontSize: 16),
+              ),
+              SizedBox(height: 20),
+              nearbyRestaurants.isEmpty
+                  ? Text('No nearby restaurants found.')
+                  : Expanded(
+                      child: ListView.builder(
+                        itemCount: nearbyRestaurants.length,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            title: Text(nearbyRestaurants[index]['name']),
+                            subtitle:
+                                Text(nearbyRestaurants[index]['vicinity']),
+                          );
+                        },
+                      ),
+                    ),
+              ElevatedButton(
+                onPressed: _makeOrder,
+                child: Text('Order Now'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class OrderConfirmationScreen extends StatelessWidget {
+  final String mealType;
+  final double budget;
+  final String restaurant;
+  final String dietRecommendation;
+
+  OrderConfirmationScreen({
+    required this.mealType,
+    required this.budget,
+    required this.restaurant,
+    required this.dietRecommendation,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Order Confirmation'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Meal Type: $mealType',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              'Budget: \$$budget',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              'Restaurant: $restaurant',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              'Diet Recommendation: $dietRecommendation',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 20),
+            SingleChildScrollView(
+              child: Flexible(
+                child: Container(
+                  height: 30,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Replace these variables with your actual captured values
+                      String mealType = 'Lunch'; // Example meal type
+                      String restaurant =
+                          'Local Restaurant'; // Example restaurant
+                      double budget = 20.0; // Example budget
+
+                      // Implement final order logic here
+                      print(
+                          'Order confirmed for $mealType at $restaurant within budget of \$$budget');
+
+                      // Navigate back to home screen
+                      Navigator.pop(
+                          context); // Close the current screen and return to the previous screen
+                    },
+                    child: Text('Confirm Order'),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
