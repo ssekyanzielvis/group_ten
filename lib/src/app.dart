@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 //import 'home_screen.dart';
-import 'screens/main_screen.dart';
+//import 'screens/main_screen.dart';
 //import 'widgets/responsive.dart';
 import 'screens/cart_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 //import 'widgets/layout.dart';
+import 'package:food_dash/authentication page.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -26,7 +27,7 @@ class App extends StatelessWidget {
       // desktop: MainScreen(),
       // ),
       routes: {
-        '/': (context) => MainScreen(),
+        '/': (context) => AuthScreen(),
         //'/menu': (context) => MenuScreen(),
         '/cart': (context) => CartScreen(
               cartItems: [],

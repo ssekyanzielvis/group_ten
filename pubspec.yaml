@@ -32,7 +32,7 @@ dependencies:
   http: ^1.0.0
   cloud_firestore: ^5.0.2
 
-  image_picker: ^1.1.2
+  image_picker: ^0.8.7+5
   #firebase_core: ^3.1.1
   firebase_database: ^11.0.2
   firebase_storage: ^12.1.0
@@ -70,7 +70,7 @@ flutter:
   uses-material-design: true
 
   assets:
-    - lib/assets/images/burger.jpg
+    
     - lib/assets/images/burger combo+ drinks.jpg
     - lib/assets/images/posho+fish.jpg
     - lib/assets/images/vegetable chicken.jpg
@@ -99,7 +99,4 @@ flutter:
     - lib/assets/images/chips+chicken.jpg
     - lib/assets/images/chips chicken salads.jfif
     - lib/assets/images/profile.jpg
-    - lib/assets/images/barnerr.jpg
-    - lib/assets/images/chicken.jpg
-    - lib/assets/images/meal.jpg
   # No need to specify app icons here, they are automatically picked from the res directories

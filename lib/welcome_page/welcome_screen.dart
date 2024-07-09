@@ -124,11 +124,11 @@ class HomeScreen extends StatelessWidget {
                 child: ListView(
                   scrollDirection: Axis.horizontal,
                   children: [
-                    _buildFeaturedMealCard('Exclusive burgers', 'assets/burger.jpg'),
-                    _buildFeaturedMealCard('Feel chick!!!', 'assets/chicken.jpg'),
-                    _buildFeaturedMealCard('In All one meal', 'assets/meal.jpg'),
-                    _buildFeaturedMealCard('Yummy spaghetti!!', 'assets/mea2.jpeg'),
-                    _buildFeaturedMealCard('delicious foods', 'assets/foods.jpeg'),
+                    _buildFeaturedMealCard('Exclusive burgers', 'assets/images/burger.jpg'),
+                    _buildFeaturedMealCard('Feel chick!!!', 'assets/images/chicken.jpg'),
+                    _buildFeaturedMealCard('In All one meal', 'assets/images/meal.jpg'),
+                    _buildFeaturedMealCard('The food Hub!', 'assets/images/barnerr.jpg'),
+                    
                     
                   ],
                 ),
