@@ -30,7 +30,7 @@ class _OrderPageState extends State<OrderPage> {
             description: 'Taste the feeling.',
             price: 10.0,
             imageUrl: 'lib/assets/images/chips chicken salads.jfif',
-            status: 'Pending',
+            status: 'Delivered',
           ),
         ],
       ),
