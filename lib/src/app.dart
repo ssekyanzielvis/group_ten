@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
-import 'widgets/widget_tree.dart';
+import 'package:food_dash/src/pages/welcome_page_ui.dart';
+//import 'widgets/widget_tree.dart';
 
 import 'screens/main_screen.dart';
 //import 'screens/cart_screen.dart';
 import 'screens/login_screen.dart';
 import 'widgets/auth_service.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  runApp(const App());
-}
+//import 'screens/signup_screen.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -34,7 +31,7 @@ class AuthWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
-      stream: AuthService().user,
+      stream: AuthService().authStateChanges,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.active) {
           User? user = snapshot.data;
@@ -48,6 +45,34 @@ class AuthWrapper extends StatelessWidget {
     );
   }
 }
+
+class WidgetTree extends StatefulWidget {
+  const WidgetTree({super.key});
+
+  @override
+  State<WidgetTree> createState() => _WidgetTreeState();
+}
+
+class _WidgetTreeState extends State<WidgetTree> {
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+      stream: AuthService().authStateChanges,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.active) {
+          if (snapshot.hasData) {
+            return WelcomePage();
+          } else {
+            return LoginScreen();
+          }
+        } else {
+          return Center(child: CircularProgressIndicator());
+        }
+      },
+    );
+  }
+}
+
 
 /*import 'package:flutter/material.dart';
 import 'screens/main_screen.dart';
@@ -69,4 +94,5 @@ class MyApp extends StatelessWidget {
       home: MainScreen(), // Set your home page widget here
     );
   }
-}*/
+}
+*/

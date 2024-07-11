@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:food_dash/src/pages/welcome_page_ui.dart';
 
 import '../pages/home_page.dart';
 import '../pages/order_page.dart';
@@ -19,7 +20,7 @@ class _MainScreenState extends State<MainScreen> {
   List<Widget> pages = [];
   Widget currentPage = HomePage();
 
-  HomePage homePage = HomePage();
+  WelcomePage homePage = WelcomePage();
   OrderPage orderPage = OrderPage();
   FavoritesPage favouritePage = FavoritesPage();
   ProfilePage profilePage = ProfilePage();
@@ -27,7 +28,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
-    homePage = HomePage();
+    homePage = WelcomePage();
     orderPage = OrderPage();
     favouritePage = FavoritesPage();
     profilePage = ProfilePage();
@@ -70,7 +71,7 @@ class _MainScreenState extends State<MainScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart),
-            label: 'Orders',
+            label: 'Cart',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.favorite),

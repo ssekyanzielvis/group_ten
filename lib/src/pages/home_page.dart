@@ -1,13 +1,19 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+//import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../screens/login_screen.dart';
 
 class HomePage extends StatefulWidget {
+  HomePage({Key? key}) : super(key: key);
+
   @override
   _HomePageState createState() => _HomePageState();
 }
 
+@override
 class _HomePageState extends State<HomePage> {
   String selectedMeal = '';
   double budget = 0.0;
@@ -36,7 +42,7 @@ class _HomePageState extends State<HomePage> {
           '?location=${position.latitude},${position.longitude}'
           '&radius=1500'
           '&type=restaurant'
-          '&key=YOUR_GOOGLE_PLACES_API_KEY';
+          '&key=9189-0514-2451';
 
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
@@ -92,6 +98,26 @@ class _HomePageState extends State<HomePage> {
         title: Text('Welcome To Food Dash',
             style: TextStyle(
                 color: Colors.blue, fontSize: 30, fontWeight: FontWeight.bold)),
+        actions: [
+          GestureDetector(
+            onTap: () async {
+              try {
+                await FirebaseAuth.instance.signOut();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                );
+              } catch (e) {
+                print('Error signing out: $e');
+                // Show an error message or handle error appropriately
+              }
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Icon(Icons.logout),
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(

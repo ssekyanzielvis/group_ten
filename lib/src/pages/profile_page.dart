@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import '../screens/edit_profile_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import '../models/user_model.dart' as UserModel;
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -9,6 +13,28 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  UserModel.User? _userProfile;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      DocumentSnapshot userData = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+      if (userData.exists && userData.data() != null) {
+        _userProfile =
+            UserModel.User.fromMap(userData.data() as Map<String, dynamic>);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,7 +72,10 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ],
                       image: DecorationImage(
-                        image: AssetImage("lib/assets/images/profile.jpg"),
+                        image: _userProfile != null
+                            ? NetworkImage(_userProfile!.photoUrl)
+                            : AssetImage("lib/assets/images/profile.jpg")
+                                as ImageProvider,
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -55,10 +84,10 @@ class _ProfilePageState extends State<ProfilePage> {
                     width: 20.0,
                   ),
                   Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        "Nancy",
+                        _userProfile?.name ?? 'Loading...',
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 20.0,
@@ -69,7 +98,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         height: 10,
                       ),
                       Text(
-                        "zainab@gmail.com",
+                        _userProfile?.email ?? 'Loading...',
                         style: TextStyle(
                           color: Colors.blue,
                           fontSize: 15.0,
@@ -79,13 +108,14 @@ class _ProfilePageState extends State<ProfilePage> {
                         height: 10,
                       ),
                       GestureDetector(
-                        onTap: () {
-                          Navigator.push(
+                        onTap: () async {
+                          await Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => EditProfileScreen(),
                             ),
                           );
+                          _loadUserData(); // Refresh profile data after editing
                         },
                         child: Container(
                           width: 100.0,

@@ -38,6 +38,7 @@ dependencies:
   firebase_storage: ^12.1.0
   geolocator: 12.0.0
   google_maps_flutter: ^2.1.0
+  flutter_dotenv: ^5.0.2
   
   
   stripe_payment: ^1.1.0
