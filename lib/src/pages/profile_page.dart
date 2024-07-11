@@ -130,7 +130,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               style: TextStyle(
                                 color: Colors.green,
                                 fontSize: 25,
-                                fontWeight: FontWeight.w400,
+                                fontWeight: FontWeight.w700,
                               ),
                             ),
                           ),
