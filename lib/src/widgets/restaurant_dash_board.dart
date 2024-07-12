@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class RestaurantDashboard extends StatefulWidget {
+  const RestaurantDashboard({super.key});
+
   @override
   _RestaurantDashboardState createState() => _RestaurantDashboardState();
 }
@@ -16,15 +18,15 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Restaurant Dashboard'),
+        title: const Text('Restaurant Dashboard'),
       ),
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           children: [
             TextFormField(
-              decoration: InputDecoration(labelText: 'Name'),
+              decoration: const InputDecoration(labelText: 'Name'),
               validator: (value) {
                 if (value!.isEmpty) {
                   return 'Please enter a name';
@@ -34,7 +36,7 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
               onSaved: (value) => _name = value,
             ),
             TextFormField(
-              decoration: InputDecoration(labelText: 'Address'),
+              decoration: const InputDecoration(labelText: 'Address'),
               validator: (value) {
                 if (value!.isEmpty) {
                   return 'Please enter an address';
@@ -44,7 +46,7 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
               onSaved: (value) => _address = value,
             ),
             TextFormField(
-              decoration: InputDecoration(labelText: 'Cuisine'),
+              decoration: const InputDecoration(labelText: 'Cuisine'),
               validator: (value) {
                 if (value!.isEmpty) {
                   return 'Please enter a cuisine';
@@ -53,7 +55,7 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
               },
               onSaved: (value) => _cuisine = value,
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () async {
                 if (_formKey.currentState!.validate()) {
@@ -62,18 +64,18 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
                   await getMenuItems();
                 }
               },
-              child: Text('Save Profile'),
+              child: const Text('Save Profile'),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ListView.builder(
               shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               itemCount: _menuItems.length,
               itemBuilder: (context, index) {
                 return ListTile(
                   title: Text(_menuItems[index].name),
                   trailing: IconButton(
-                    icon: Icon(Icons.delete),
+                    icon: const Icon(Icons.delete),
                     onPressed: () async {
                       await deleteMenuitem(_menuItems[index].id);
                       await getMenuItems();
@@ -82,13 +84,13 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
                 );
               },
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () async {
                 await addMenuitem();
                 await getMenuItems();
               },
-              child: Text('Add Menu Item'),
+              child: const Text('Add Menu Item'),
             ),
           ],
         ),
@@ -97,7 +99,7 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
   }
 
   Future<void> updateRestaurantProfile() async {
-    final url = 'your_update_profile_api_endpoint';
+    const url = 'your_update_profile_api_endpoint';
     final params = {
       'name': _name,
       'address': _address,
@@ -116,7 +118,7 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
   }
 
   Future<void> getMenuItems() async {
-    final url = 'your_get_menu_items_api_endpoint';
+    const url = 'your_get_menu_items_api_endpoint';
     final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       final jsonData = jsonDecode(response.body);
@@ -130,7 +132,7 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
   }
 
   Future<void> addMenuitem() async {
-    final url = 'your_add_menu_item_api_endpoint';
+    const url = 'your_add_menu_item_api_endpoint';
     final params = {
       'name': 'New Menu Item',
       'price': 10.99,

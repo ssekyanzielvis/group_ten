@@ -8,13 +8,13 @@ class OrderCard extends StatelessWidget {
   final String status;
 
   const OrderCard({
-    Key? key,
+    super.key,
     required this.foodItem,
     required this.description,
     required this.price,
     required this.imageUrl,
     required this.status,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

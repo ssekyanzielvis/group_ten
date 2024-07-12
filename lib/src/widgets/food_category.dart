@@ -8,11 +8,11 @@ class FoodCategory extends StatelessWidget {
   final List<Category> _categories = categories;
   final Function(CartItem) onAddToCart;
 
-  FoodCategory({required this.onAddToCart});
+  FoodCategory({super.key, required this.onAddToCart});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: 80.0,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,

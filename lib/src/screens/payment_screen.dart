@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:stripe_payment/stripe_payment.dart';
 
 class PaymentPage extends StatefulWidget {
+  const PaymentPage({super.key});
+
   @override
   _PaymentPageState createState() => _PaymentPageState();
 }
@@ -45,7 +47,7 @@ class _PaymentPageState extends State<PaymentPage> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text("Payment"),
+        title: const Text("Payment"),
       ),
       body: Center(
         child: Column(
@@ -66,7 +68,7 @@ class _PaymentPageState extends State<PaymentPage> {
                   );
                 }).catchError(setError);
               },
-              child: Text('Pay with Card'),
+              child: const Text('Pay with Card'),
             ),
             if (_paymentToken != null)
               Text('Payment token: ${_paymentToken!.tokenId}'),

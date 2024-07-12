@@ -4,13 +4,13 @@ import '../models/cart_item.dart';
 class CartScreen extends StatelessWidget {
   final List<CartItem> cartItems;
 
-  const CartScreen({Key? key, required this.cartItems}) : super(key: key);
+  const CartScreen({super.key, required this.cartItems});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Cart'),
+        title: const Text('Cart'),
       ),
       body: ListView.builder(
         itemCount: cartItems.length,

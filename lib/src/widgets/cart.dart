@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../models/cart_item.dart'; // Import your CartItem model
 
 class CartScreen extends StatefulWidget {
+  const CartScreen({super.key});
+
   @override
   _CartScreenState createState() => _CartScreenState();
 }
@@ -25,7 +27,7 @@ class _CartScreenState extends State<CartScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Your Cart'),
+        title: const Text('Your Cart'),
       ),
       body: ListView.builder(
         itemCount: cartItems.length,
@@ -42,7 +44,7 @@ class _CartScreenState extends State<CartScreen> {
               title: Text(item.categoryName),
               subtitle: Text('Quantity: ${item.quantity}'),
               trailing: IconButton(
-                icon: Icon(Icons.delete),
+                icon: const Icon(Icons.delete),
                 onPressed: () {
                   removeItem(index);
                 },

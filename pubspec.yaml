@@ -39,6 +39,7 @@ dependencies:
   geolocator: 12.0.0
   google_maps_flutter: ^2.1.0
   flutter_dotenv: ^5.0.2
+
   
   
   stripe_payment: ^1.1.0
@@ -74,32 +75,5 @@ flutter:
 
   assets:
     
-    - lib/assets/images/burger combo+ drinks.jpg
-    - lib/assets/images/posho+fish.jpg
-    - lib/assets/images/vegetable chicken.jpg
-    - lib/assets/images/vegetable noodles.jpg
-    - lib/assets/images/snacks.jpg
-    - lib/assets/images/youghut.jfif
-    - lib/assets/images/rolex.jfif
-    - lib/assets/images/paste gnuts.jfif
-    - lib/assets/images/pilau beef lusania.jpg
-    - lib/assets/images/chips+fish.jfif
-    - lib/assets/images/casava chips.jpg
-    - lib/assets/images/pineapple juice.jfif
-    - lib/assets/images/sausagevip.jpg
-    - lib/assets/images/pizza combo.jpg
-    - lib/assets/images/pilau+fish.jpg
-    - lib/assets/images/chicken favourite.jpg
-    - lib/assets/images/chips chicken salads.jfif
-    - lib/assets/images/chapati.jfif
-    - lib/assets/images/all favourites ice cream.jfif
-    - lib/assets/images/pilau+beef.jpg
-    - lib/assets/images/sausage breakfast.jpg
-    - lib/assets/images/youghut tinned.jfif
-    - lib/assets/images/EggRoll.jpg
-    - lib/assets/images/chapatifestival.jpg
-    - lib/assets/images/rolex.jfif
-    - lib/assets/images/chips+chicken.jpg
-    - lib/assets/images/chips chicken salads.jfif
-    - lib/assets/images/profile.jpg
+
   # No need to specify app icons here, they are automatically picked from the res directories

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-//import '../models/choice.dart';
-//import '../models/order_confirmation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../screens/login_screen.dart';
+import '../pages/register_restaurant_page.dart';
 
 class WelcomePage extends StatefulWidget {
+  const WelcomePage({super.key});
+
   @override
   _WelcomePageState createState() => _WelcomePageState();
 }
@@ -13,92 +14,176 @@ class WelcomePage extends StatefulWidget {
 class _WelcomePageState extends State<WelcomePage> {
   String? _selectedMealType;
   final _budgetController = TextEditingController();
-  String? _selectedPaymentMethod;
-  String _deliveryAddress =
-      "Your current location"; // Placeholder for user location
+
+  @override
+  void dispose() {
+    _budgetController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Welcome to Food Dash'),
+        title: const Text(
+          'Welcome to Food Dash',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
         actions: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue, // background color
+              foregroundColor: Colors.white, // text color
+              shadowColor: Colors.black, // shadow color
+              elevation: 5, // elevation
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10), // rounded corners
+              ),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 10, vertical: 5), // padding
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const RegisterRestaurantPage()),
+              );
+            },
+            child: const Text('Register Restaurant',
+                style: TextStyle(fontSize: 12)), // text style
+          ),
           GestureDetector(
             onTap: () async {
               try {
                 await FirebaseAuth.instance.signOut();
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
                 );
               } catch (e) {
                 print('Error signing out: $e');
-                // Show an error message or handle error appropriately
               }
             },
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Icon(Icons.logout),
+            child: const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Icon(
+                Icons.logout,
+                color: Colors.white,
+              ),
             ),
           ),
         ],
+        backgroundColor: Colors.deepOrange,
+        centerTitle: true,
+        elevation: 10,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Choose your meal:',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            ListTile(
-              title: const Text('Breakfast'),
-              leading: Radio<String>(
-                value: 'Breakfast',
-                groupValue: _selectedMealType,
-                onChanged: (String? value) {
-                  setState(() {
-                    _selectedMealType = value;
-                  });
-                },
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Choose your meal:',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.deepOrange,
+                ),
               ),
-            ),
-            ListTile(
-              title: const Text('Lunch'),
-              leading: Radio<String>(
-                value: 'Lunch',
-                groupValue: _selectedMealType,
-                onChanged: (String? value) {
-                  setState(() {
-                    _selectedMealType = value;
-                  });
-                },
-              ),
-            ),
-            ListTile(
-              title: const Text('Dinner'),
-              leading: Radio<String>(
-                value: 'Dinner',
-                groupValue: _selectedMealType,
-                onChanged: (String? value) {
-                  setState(() {
-                    _selectedMealType = value;
-                  });
-                },
-              ),
-            ),
-            TextField(
-              controller: _budgetController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(labelText: 'Enter your budget'),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _showAvailableFoods,
-              child: Text('Show Available Foods'),
-            ),
-          ],
+              const SizedBox(height: 10),
+              _buildMealTypeOption('Breakfast'),
+              const SizedBox(height: 5),
+              _buildMealTypeOption('Lunch'),
+              const SizedBox(height: 5),
+              _buildMealTypeOption('Dinner'),
+              const SizedBox(height: 20),
+              _buildBudgetField(),
+              const SizedBox(height: 20),
+              _buildShowFoodsButton(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMealTypeOption(String mealType) {
+    return ListTile(
+      title: Text(
+        mealType,
+        style: const TextStyle(
+          fontSize: 18,
+          color: Colors.black,
+        ),
+      ),
+      leading: Radio<String>(
+        value: mealType,
+        groupValue: _selectedMealType,
+        onChanged: (String? value) {
+          setState(() {
+            _selectedMealType = value;
+          });
+        },
+      ),
+      contentPadding: const EdgeInsets.all(10),
+      tileColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+        side: const BorderSide(color: Colors.deepOrange, width: 1),
+      ),
+    );
+  }
+
+  Widget _buildBudgetField() {
+    return TextField(
+      controller: _budgetController,
+      keyboardType: TextInputType.number,
+      decoration: InputDecoration(
+        labelText: 'Enter your budget',
+        labelStyle: const TextStyle(
+          fontSize: 18,
+          color: Colors.grey,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderSide: const BorderSide(
+            color: Colors.deepOrange,
+            width: 2,
+          ),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: const BorderSide(
+            color: Colors.deepOrange,
+            width: 2,
+          ),
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShowFoodsButton() {
+    return Center(
+      child: ElevatedButton(
+        onPressed: _showAvailableFoods,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.deepOrange,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        child: const Text(
+          'Show Available Foods',
+          style: TextStyle(
+            fontSize: 18,
+            color: Colors.white,
+          ),
         ),
       ),
     );
@@ -108,9 +193,9 @@ class _WelcomePageState extends State<WelcomePage> {
     final budget = double.tryParse(_budgetController.text) ?? 0.0;
     if (_selectedMealType == null || budget <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content:
-                Text('Please select a meal type and enter a valid budget')),
+        const SnackBar(
+          content: Text('Please select a meal type and enter a valid budget'),
+        ),
       );
       return;
     }
@@ -133,7 +218,7 @@ class _WelcomePageState extends State<WelcomePage> {
         .add(order.toMap())
         .then((_) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Order placed successfully!')),
+        const SnackBar(content: Text('Order placed successfully!')),
       );
     }).catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -143,131 +228,168 @@ class _WelcomePageState extends State<WelcomePage> {
   }
 }
 
-class AvailableFoodsPage extends StatelessWidget {
+class Order {
+  final String foodName;
+  final String restaurant;
+  final String paymentMethod;
+
+  Order({
+    required this.foodName,
+    required this.restaurant,
+    required this.paymentMethod,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'foodName': foodName,
+      'restaurant': restaurant,
+      'paymentMethod': paymentMethod,
+    };
+  }
+}
+
+class AvailableFoodsPage extends StatefulWidget {
   final String mealType;
   final double budget;
   final Function(Order) onOrderConfirmed;
 
-  AvailableFoodsPage({
+  const AvailableFoodsPage({
+    super.key,
     required this.mealType,
     required this.budget,
     required this.onOrderConfirmed,
   });
 
   @override
-  Widget build(BuildContext context) {
-    // Simulating available foods and restaurants based on budget
-    final availableFoods = [
-      {'name': 'Food 1', 'restaurant': 'Restaurant A'},
-      {'name': 'Food 2', 'restaurant': 'Restaurant B'},
-    ];
+  _AvailableFoodsPageState createState() => _AvailableFoodsPageState();
+}
 
+class _AvailableFoodsPageState extends State<AvailableFoodsPage> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  List<Map<String, dynamic>> availableFoods = [];
+  List<Map<String, dynamic>> availableRestaurants = [];
+  String? _selectedPaymentMethod;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchFoodsAndRestaurants();
+  }
+
+  void _showPaymentDialog(
+      BuildContext context, String foodName, String restaurant) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Select Payment Method'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RadioListTile<String>(
+                value: 'Credit Card',
+                groupValue: _selectedPaymentMethod,
+                onChanged: (value) {
+                  setState(() {
+                    _selectedPaymentMethod = value;
+                  });
+                },
+                title: const Text('Credit Card'),
+              ),
+              RadioListTile<String>(
+                value: 'Cash',
+                groupValue: _selectedPaymentMethod,
+                onChanged: (value) {
+                  setState(() {
+                    _selectedPaymentMethod = value;
+                  });
+                },
+                title: const Text('Cash'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                if (_selectedPaymentMethod != null) {
+                  final order = Order(
+                    foodName: foodName,
+                    restaurant: restaurant,
+                    paymentMethod: _selectedPaymentMethod!,
+                  );
+                  widget.onOrderConfirmed(order);
+                  Navigator.pop(context);
+                }
+              },
+              child: const Text('Confirm'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> fetchFoodsAndRestaurants() async {
+    try {
+      final foodsSnapshot = await _firestore
+          .collection('foods')
+          .where('mealType', isEqualTo: widget.mealType)
+          .where('price', isLessThanOrEqualTo: widget.budget)
+          .get();
+      final restaurantsSnapshot =
+          await _firestore.collection('restaurants').get();
+
+      final foods = foodsSnapshot.docs.map((doc) {
+        return {
+          'name': doc['name'],
+          'restaurant': doc['restaurant'],
+          'price': doc['price'],
+        };
+      }).toList();
+
+      final restaurants = restaurantsSnapshot.docs.map((doc) {
+        return {
+          'name': doc['name'],
+          'budget': doc['budget'],
+        };
+      }).toList();
+
+      if (mounted) {
+        setState(() {
+          availableFoods = foods;
+          availableRestaurants = restaurants;
+        });
+      }
+    } catch (e) {
+      print("Error fetching foods and restaurants: $e");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Available Foods'),
+        title: const Text('Available Foods'),
       ),
       body: ListView.builder(
         itemCount: availableFoods.length,
         itemBuilder: (context, index) {
           final food = availableFoods[index];
           return ListTile(
-            title: Text(food['name']!),
+            title: Text(food['name']),
             subtitle: Text('Restaurant: ${food['restaurant']}'),
             onTap: () {
-              _showPaymentDialog(context, food['restaurant']!);
+              _showPaymentDialog(context, food['name'], food['restaurant']);
             },
           );
         },
       ),
-    );
-  }
-
-  void _showPaymentDialog(BuildContext context, String restaurant) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Payment Method'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                title: const Text('Cash'),
-                leading: Radio<String>(
-                  value: 'Cash',
-                  groupValue: _selectedPaymentMethod,
-                  onChanged: (String? value) {
-                    _selectedPaymentMethod = value;
-                    Navigator.pop(context);
-                    _confirmOrder(context, restaurant);
-                  },
-                ),
-              ),
-              ListTile(
-                title: const Text('Mobile Money'),
-                leading: Radio<String>(
-                  value: 'Mobile Money',
-                  groupValue: _selectedPaymentMethod,
-                  onChanged: (String? value) {
-                    _selectedPaymentMethod = value;
-                    Navigator.pop(context);
-                    _confirmOrder(context, restaurant);
-                  },
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  void _confirmOrder(BuildContext context, String restaurant) {
-    final order = Order(
-      mealType: mealType,
-      budget: budget,
-      paymentMethod: _selectedPaymentMethod!,
-      restaurant: restaurant,
-      deliveryAddress: 'Current Location', // Placeholder for user's location
-    );
-    onOrderConfirmed(order);
-  }
-
-  String? _selectedPaymentMethod;
-}
-
-class Order {
-  final String mealType;
-  final double budget;
-  final String paymentMethod;
-  final String restaurant;
-  final String deliveryAddress;
-
-  Order({
-    required this.mealType,
-    required this.budget,
-    required this.paymentMethod,
-    required this.restaurant,
-    required this.deliveryAddress,
-  });
-
-  Map<String, dynamic> toMap() {
-    return {
-      'mealType': mealType,
-      'budget': budget,
-      'paymentMethod': paymentMethod,
-      'restaurant': restaurant,
-      'deliveryAddress': deliveryAddress,
-    };
-  }
-
-  static Order fromMap(Map<String, dynamic> map) {
-    return Order(
-      mealType: map['mealType'],
-      budget: map['budget'],
-      paymentMethod: map['paymentMethod'],
-      restaurant: map['restaurant'],
-      deliveryAddress: map['deliveryAddress'],
     );
   }
 }

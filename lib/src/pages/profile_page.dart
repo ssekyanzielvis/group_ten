@@ -31,6 +31,12 @@ class _ProfilePageState extends State<ProfilePage> {
       if (userData.exists && userData.data() != null) {
         _userProfile =
             UserModel.User.fromMap(userData.data() as Map<String, dynamic>);
+        setState(() {
+          _userProfile?.photoUrl = userData['photoUrl'];
+          _userProfile?.email = userData['email'];
+          _userProfile?.phoneNumber = userData['phoneNumber'];
+          _userProfile?.location = userData['location'];
+        });
       }
     }
   }
@@ -40,18 +46,28 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
-          padding: EdgeInsets.symmetric(vertical: 50.0, horizontal: 20),
+          padding: const EdgeInsets.symmetric(vertical: 50.0, horizontal: 20),
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.blueAccent,
+                Colors.cyanAccent,
+              ],
+            ),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(
+              const Text(
                 "Profile",
                 style: TextStyle(
-                    color: Colors.black,
+                    color: Colors.white,
                     fontSize: 30,
                     fontWeight: FontWeight.bold),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 20.0,
               ),
               Row(
@@ -68,19 +84,20 @@ class _ProfilePageState extends State<ProfilePage> {
                               .withOpacity(0.2),
                           spreadRadius: 5.0,
                           blurRadius: 7.0,
-                          offset: Offset(0.0, 3.0),
+                          offset: const Offset(0.0, 3.0),
                         ),
                       ],
+                      border: Border.all(color: Colors.white, width: 2),
                       image: DecorationImage(
                         image: _userProfile != null
                             ? NetworkImage(_userProfile!.photoUrl)
-                            : AssetImage("lib/assets/images/profile.jpg")
+                            : const AssetImage("lib/assets/images/profile.jpg")
                                 as ImageProvider,
                         fit: BoxFit.cover,
                       ),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 20.0,
                   ),
                   Column(
@@ -88,23 +105,23 @@ class _ProfilePageState extends State<ProfilePage> {
                     children: <Widget>[
                       Text(
                         _userProfile?.name ?? 'Loading...',
-                        style: TextStyle(
-                          color: Colors.black,
+                        style: const TextStyle(
+                          color: Colors.white,
                           fontSize: 20.0,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 10,
                       ),
                       Text(
                         _userProfile?.email ?? 'Loading...',
-                        style: TextStyle(
-                          color: Colors.blue,
+                        style: const TextStyle(
+                          color: Colors.blueAccent,
                           fontSize: 15.0,
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 10,
                       ),
                       GestureDetector(
@@ -112,7 +129,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           await Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => EditProfileScreen(),
+                              builder: (context) => const EditProfileScreen(),
                             ),
                           );
                           _loadUserData(); // Refresh profile data after editing
@@ -123,12 +140,13 @@ class _ProfilePageState extends State<ProfilePage> {
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.lightGreen),
                             borderRadius: BorderRadius.circular(20),
+                            color: Colors.greenAccent,
                           ),
-                          child: Center(
+                          child: const Center(
                             child: Text(
                               'Edit',
                               style: TextStyle(
-                                color: Colors.green,
+                                color: Colors.white,
                                 fontSize: 25,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -140,25 +158,29 @@ class _ProfilePageState extends State<ProfilePage> {
                   )
                 ],
               ),
-              SizedBox(
+              const SizedBox(
                 height: 20.0,
               ),
-              Text(
+              const Text(
                 "Account",
                 style: TextStyle(
-                  color: Colors.black,
+                  color: Colors.white,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               Card(
-                child: Padding(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                elevation: 5,
+                child: const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20.0),
                   child: Column(
                     children: <Widget>[
                       Row(
                         children: <Widget>[
-                          Icon(Icons.location_on, color: Colors.blue),
+                          Icon(Icons.location_on, color: Colors.blueAccent),
                           SizedBox(width: 10),
                           Text("Location"),
                         ],
@@ -170,7 +192,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       Row(
                         children: <Widget>[
-                          Icon(Icons.visibility, color: Colors.blue),
+                          Icon(Icons.visibility, color: Colors.blueAccent),
                           SizedBox(width: 10),
                           Text("Change Password"),
                         ],
@@ -182,7 +204,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       Row(
                         children: <Widget>[
-                          Icon(Icons.shopping_bag, color: Colors.blue),
+                          Icon(Icons.shopping_bag, color: Colors.blueAccent),
                           SizedBox(width: 10),
                           Text("Shipping"),
                         ],
@@ -194,7 +216,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       Row(
                         children: <Widget>[
-                          Icon(Icons.paypal, color: Colors.blue),
+                          Icon(Icons.paypal, color: Colors.blueAccent),
                           SizedBox(width: 10),
                           Text("Payment"),
                         ],

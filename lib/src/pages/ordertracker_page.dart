@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -12,7 +14,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.orange,
       ),
-      home: OrderTrackPage(),
+      home: const OrderTrackPage(),
     );
   }
 }
@@ -25,27 +27,29 @@ class OrderTrackPage extends StatelessWidget {
     "Delivered"
   ];
 
-  final int currentStage = 2; // Example: Order is currently "Out for Delivery"
+  final int currentStage = 2;
+
+  const OrderTrackPage({super.key}); // Example: Order is currently "Out for Delivery"
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Track Order"),
+        title: const Text("Track Order"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               "Order Status",
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             for (int i = 0; i < orderStages.length; i++)
               OrderStageTile(
                 stageName: orderStages[i],
@@ -62,7 +66,7 @@ class OrderStageTile extends StatelessWidget {
   final String stageName;
   final bool isActive;
 
-  OrderStageTile({required this.stageName, required this.isActive});
+  const OrderStageTile({super.key, required this.stageName, required this.isActive});
 
   @override
   Widget build(BuildContext context) {

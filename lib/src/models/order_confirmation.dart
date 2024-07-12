@@ -6,7 +6,7 @@ class OrderConfirmationScreen extends StatelessWidget {
   final String restaurant;
   final String dietRecommendation;
 
-  OrderConfirmationScreen({
+  const OrderConfirmationScreen({super.key, 
     required this.mealType,
     required this.budget,
     required this.restaurant,
@@ -17,7 +17,7 @@ class OrderConfirmationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Order Confirmation'),
+        title: const Text('Order Confirmation'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -26,24 +26,24 @@ class OrderConfirmationScreen extends StatelessWidget {
           children: [
             Text(
               'Meal Type: $mealType',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             Text(
               'Budget: \$$budget',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             Text(
               'Restaurant: $restaurant',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             Text(
               'Diet Recommendation: $dietRecommendation',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             SingleChildScrollView(
               child: Flexible(
-                child: Container(
+                child: SizedBox(
                   height: 30,
                   child: ElevatedButton(
                     onPressed: () {
@@ -61,7 +61,7 @@ class OrderConfirmationScreen extends StatelessWidget {
                       Navigator.pop(
                           context); // Close the current screen and return to the previous screen
                     },
-                    child: Text('Confirm Order'),
+                    child: const Text('Confirm Order'),
                   ),
                 ),
               ),

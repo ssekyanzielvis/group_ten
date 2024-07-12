@@ -3,6 +3,8 @@ import '../widgets/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class SignupScreen extends StatefulWidget {
+  const SignupScreen({super.key});
+
   @override
   _SignupScreenState createState() => _SignupScreenState();
 }
@@ -42,7 +44,7 @@ class _SignupScreenState extends State<SignupScreen> {
       obscureText: isPassword,
       decoration: InputDecoration(
         labelText: title,
-        border: OutlineInputBorder(),
+        border: const OutlineInputBorder(),
       ),
     );
   }
@@ -50,7 +52,7 @@ class _SignupScreenState extends State<SignupScreen> {
   Widget _errorMessage() {
     return Text(
       errorMessage ?? 'Failed due to incorrect data',
-      style: TextStyle(
+      style: const TextStyle(
         color: Colors.red,
       ),
     );
@@ -59,12 +61,12 @@ class _SignupScreenState extends State<SignupScreen> {
   Widget _submitButton() {
     return ElevatedButton(
       onPressed: createUserWithEmailAndPassword,
-      child: Text('Sign Up'),
       style: ElevatedButton.styleFrom(
         iconColor: Colors.orange,
-        padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-        textStyle: TextStyle(fontSize: 18),
+        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+        textStyle: const TextStyle(fontSize: 18),
       ),
+      child: const Text('Sign Up'),
     );
   }
 
@@ -78,26 +80,26 @@ class _SignupScreenState extends State<SignupScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Icon(
+                const Icon(
                   Icons.fastfood,
                   size: 100.0,
                   color: Colors.orange,
                 ),
-                SizedBox(height: 50.0),
+                const SizedBox(height: 50.0),
                 _title(),
-                SizedBox(height: 20.0),
+                const SizedBox(height: 20.0),
                 _entryField('Email', _emailController),
-                SizedBox(height: 20.0),
+                const SizedBox(height: 20.0),
                 _entryField('Password', _passwordController, isPassword: true),
-                SizedBox(height: 20.0),
+                const SizedBox(height: 20.0),
                 _errorMessage(),
-                SizedBox(height: 20.0),
+                const SizedBox(height: 20.0),
                 _submitButton(),
                 TextButton(
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  child: Text(
+                  child: const Text(
                     'Already have an account? Login',
                     style: TextStyle(color: Colors.blue),
                   ),

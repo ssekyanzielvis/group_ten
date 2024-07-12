@@ -8,7 +8,7 @@ class FoodCard extends StatelessWidget {
   final String numberOfItems;
   final Function(CartItem) onAddToCart;
 
-  FoodCard({
+  const FoodCard({super.key, 
     required this.categoryName,
     required this.imagePath,
     required this.numberOfItems,
@@ -18,7 +18,7 @@ class FoodCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(right: 20.0),
+      margin: const EdgeInsets.only(right: 20.0),
       child: InkWell(
         onTap: () {
           // Add your onTap functionality here

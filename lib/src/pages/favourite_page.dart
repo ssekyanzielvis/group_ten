@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../models/favourite_item.dart';
 
 class FavoritesPage extends StatelessWidget {
-  const FavoritesPage({Key? key}) : super(key: key);
+  const FavoritesPage({super.key});
 
   @override
   Widget build(BuildContext context) {

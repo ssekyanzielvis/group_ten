@@ -9,7 +9,7 @@ class BoughtFoods extends StatefulWidget {
   final double discount;
   final double ratings;
 
-  BoughtFoods({
+  const BoughtFoods({super.key, 
     required this.id,
     required this.name,
     required this.imagePath,
@@ -30,7 +30,7 @@ class _BoughtFoodsState extends State<BoughtFoods> {
       borderRadius: BorderRadius.circular(10.0),
       child: Stack(
         children: <Widget>[
-          Container(
+          SizedBox(
             height: 200.0,
             width: 340.0,
             child: Image.asset(
@@ -44,7 +44,7 @@ class _BoughtFoodsState extends State<BoughtFoods> {
             child: Container(
               height: 60.0,
               width: 340.0,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                   gradient: LinearGradient(
                 colors: [
                   Colors.black,
@@ -67,7 +67,7 @@ class _BoughtFoodsState extends State<BoughtFoods> {
                   children: <Widget>[
                     Text(
                       widget.name,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 20.0,
                         fontWeight: FontWeight.bold,
@@ -75,35 +75,35 @@ class _BoughtFoodsState extends State<BoughtFoods> {
                     ),
                     Row(
                       children: <Widget>[
-                        Icon(
+                        const Icon(
                           Icons.star,
                           color: Colors.red,
                           size: 18,
                         ),
-                        Icon(
+                        const Icon(
                           Icons.star,
                           color: Colors.red,
                           size: 18,
                         ),
-                        Icon(
+                        const Icon(
                           Icons.star,
                           color: Colors.red,
                           size: 18,
                         ),
-                        Icon(
+                        const Icon(
                           Icons.star,
                           color: Colors.red,
                           size: 18,
                         ),
-                        Icon(
+                        const Icon(
                           Icons.star,
                           color: Colors.red,
                           size: 18,
                         ),
-                        SizedBox(width: 2.0),
+                        const SizedBox(width: 2.0),
                         Text(
-                          "(" + widget.ratings.toString() + " Reviews)",
-                          style: TextStyle(
+                          "(${widget.ratings} Reviews)",
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 15.0,
                           ),
@@ -116,12 +116,12 @@ class _BoughtFoodsState extends State<BoughtFoods> {
                   children: <Widget>[
                     Text(
                       widget.price.toString(),
-                      style: TextStyle(
+                      style: const TextStyle(
                           color: Colors.grey,
                           fontSize: 15,
                           fontWeight: FontWeight.bold),
                     ),
-                    Text(
+                    const Text(
                       "Full Package.",
                       style: TextStyle(
                           color: Colors.grey,

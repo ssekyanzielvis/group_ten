@@ -1,14 +1,19 @@
 class User {
-  final String uid;
-  final String name;
-  final String email;
-  final String photoUrl;
+  String uid;
+  String name;
+  String email;
+  String photoUrl;
+  String location;
+  String phoneNumber;
 
-  User(
-      {required this.uid,
-      required this.name,
-      required this.email,
-      required this.photoUrl});
+  User({
+    required this.uid,
+    required this.name,
+    required this.email,
+    required this.photoUrl,
+    required this.location,
+    required this.phoneNumber,
+  });
 
   Map<String, dynamic> toMap() {
     return {
@@ -16,6 +21,8 @@ class User {
       'name': name,
       'email': email,
       'photoUrl': photoUrl,
+      'location': location,
+      'phoneNumber': phoneNumber,
     };
   }
 
@@ -25,6 +32,19 @@ class User {
       name: map['name'] ?? '',
       email: map['email'] ?? '',
       photoUrl: map['photoUrl'] ?? '',
+      location: map['location'] ?? '',
+      phoneNumber: map['phoneNumber'] ?? '',
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'uid': uid,
+      'name': name,
+      'email': email,
+      'photoUrl': photoUrl,
+      'location': location,
+      'phoneNumber': phoneNumber,
+    };
   }
 }

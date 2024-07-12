@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:food_dash/src/pages/welcome_page_ui.dart';
 
-import '../pages/home_page.dart';
 import '../pages/order_page.dart';
 import '../pages/favourite_page.dart';
 import '../pages/profile_page.dart';
@@ -18,20 +17,20 @@ class _MainScreenState extends State<MainScreen> {
   int currentTabIndex = 0;
 
   List<Widget> pages = [];
-  Widget currentPage = HomePage();
+  Widget currentPage = const WelcomePage();
 
-  WelcomePage homePage = WelcomePage();
-  OrderPage orderPage = OrderPage();
-  FavoritesPage favouritePage = FavoritesPage();
-  ProfilePage profilePage = ProfilePage();
+  WelcomePage homePage = const WelcomePage();
+  OrderPage orderPage = const OrderPage();
+  FavoritesPage favouritePage = const FavoritesPage();
+  ProfilePage profilePage = const ProfilePage();
 
   @override
   void initState() {
     super.initState();
-    homePage = WelcomePage();
-    orderPage = OrderPage();
-    favouritePage = FavoritesPage();
-    profilePage = ProfilePage();
+    homePage = const WelcomePage();
+    orderPage = const OrderPage();
+    favouritePage = const FavoritesPage();
+    profilePage = const ProfilePage();
     pages = [
       homePage,
       orderPage,
@@ -42,13 +41,14 @@ class _MainScreenState extends State<MainScreen> {
         0]; // Initialize currentPage with the first page in the pages list
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Food Dash'),
+        title: const Text('Food Dash'),
         actions: [
           IconButton(
-            icon: Icon(Icons.logout),
+            icon: const Icon(Icons.logout),
             onPressed: () async {
               await AuthService().signOut();
             },
@@ -64,7 +64,7 @@ class _MainScreenState extends State<MainScreen> {
         },
         currentIndex: currentTabIndex,
         type: BottomNavigationBarType.fixed,
-        items: <BottomNavigationBarItem>[
+        items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',

@@ -4,6 +4,8 @@ import '../widgets/auth_service.dart';
 import 'signup_screen.dart';
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -54,7 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
       obscureText: isPassword,
       decoration: InputDecoration(
         labelText: title,
-        border: OutlineInputBorder(),
+        border: const OutlineInputBorder(),
       ),
     );
   }
@@ -62,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _errorMessage() {
     return Text(
       errorMessage ?? '',
-      style: TextStyle(
+      style: const TextStyle(
         color: Colors.red,
       ),
     );
@@ -72,12 +74,12 @@ class _LoginScreenState extends State<LoginScreen> {
     return ElevatedButton(
       onPressed:
           isLogin ? signInWithEmailAndPassword : createUserWithEmailAndPassword,
-      child: Text(isLogin ? 'Login' : 'Sign Up'),
       style: ElevatedButton.styleFrom(
         iconColor: Colors.orange,
-        padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-        textStyle: TextStyle(fontSize: 18),
+        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+        textStyle: const TextStyle(fontSize: 18),
       ),
+      child: Text(isLogin ? 'Login' : 'Sign Up'),
     );
   }
 
@@ -90,7 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
       },
       child: Text(
         isLogin ? 'Sign Up' : 'Login',
-        style: TextStyle(
+        style: const TextStyle(
           color: Colors.blue,
         ),
       ),
@@ -107,41 +109,41 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Icon(
+                const Icon(
                   Icons.fastfood,
                   size: 100.0,
                   color: Colors.orange,
                 ),
-                SizedBox(height: 50.0),
+                const SizedBox(height: 50.0),
                 _title(),
-                SizedBox(height: 20.0),
+                const SizedBox(height: 20.0),
                 _entryField('Email', _emailController),
-                SizedBox(height: 20.0),
+                const SizedBox(height: 20.0),
                 _entryField('Password', _passwordController, isPassword: true),
-                SizedBox(height: 20.0),
+                const SizedBox(height: 20.0),
                 _errorMessage(),
-                SizedBox(height: 20.0),
+                const SizedBox(height: 20.0),
                 _submitButton(),
                 _loginOrSignUpButton(),
-                SizedBox(height: 20.0),
+                const SizedBox(height: 20.0),
                 TextButton(
                   onPressed: () {
                     _ForgotPasswordScreenState createState() =>
                         _ForgotPasswordScreenState();
                     // Handle forgot password action
                   },
-                  child: Text('Forgot Password?'),
+                  child: const Text('Forgot Password?'),
                 ),
-                Divider(),
+                const Divider(),
                 ElevatedButton.icon(
                   onPressed: () {
-                    void _signInWithGoogle() async {
+                    void signInWithGoogle() async {
                       User? user = await _authService.signInWithGoogle();
                       if (user != null) {
                         Navigator.pushReplacementNamed(context, '/home');
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
+                          const SnackBar(
                               content: Text('Failed to sign in with Google')),
                         );
                       }
@@ -149,22 +151,22 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     // Handle login with FoodApp action
                   },
-                  icon: Icon(Icons.fastfood, color: Colors.white),
-                  label: Text('Log In with Google'),
+                  icon: const Icon(Icons.fastfood, color: Colors.white),
+                  label: const Text('Log In with Google'),
                   style: ElevatedButton.styleFrom(
                     iconColor: Colors.blueAccent,
-                    padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                    textStyle: TextStyle(fontSize: 18),
+                    padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                    textStyle: const TextStyle(fontSize: 18),
                   ),
                 ),
                 TextButton(
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => SignupScreen()),
+                      MaterialPageRoute(builder: (context) => const SignupScreen()),
                     );
                   },
-                  child: Text('Sign Up'),
+                  child: const Text('Sign Up'),
                 ),
               ],
             ),
@@ -183,6 +185,8 @@ class _LoginScreenState extends State<LoginScreen> {
 }
 
 class ForgotPasswordScreen extends StatefulWidget {
+  const ForgotPasswordScreen({super.key});
+
   @override
   _ForgotPasswordScreenState createState() => _ForgotPasswordScreenState();
 }
@@ -196,7 +200,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
     if (email.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please enter your email address')),
+        const SnackBar(content: Text('Please enter your email address')),
       );
       return;
     }
@@ -204,7 +208,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     try {
       await _firebaseAuth.sendPasswordResetEmail(email: email);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Password reset email sent')),
+        const SnackBar(content: Text('Password reset email sent')),
       );
       Navigator.pop(context);
     } catch (e) {
@@ -218,25 +222,25 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Forgot Password'),
+        title: const Text('Forgot Password'),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextField(
               controller: _emailController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Email',
                 border: OutlineInputBorder(),
               ),
               keyboardType: TextInputType.emailAddress,
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _sendPasswordResetEmail,
-              child: Text('Send Password Reset Email'),
+              child: const Text('Send Password Reset Email'),
             ),
           ],
         ),

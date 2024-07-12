@@ -4,6 +4,8 @@ import '../models/menu_item.dart';
 import '../models/menu_servise.dart';
 
 class MenuScreen extends StatefulWidget {
+  const MenuScreen({super.key});
+
   @override
   _MenuScreenState createState() => _MenuScreenState();
 }
@@ -18,7 +20,7 @@ class _MenuScreenState extends State<MenuScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Menu'),
+        title: const Text('Menu'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -26,25 +28,25 @@ class _MenuScreenState extends State<MenuScreen> {
           children: [
             TextField(
               controller: _nameController,
-              decoration: InputDecoration(labelText: 'Name'),
+              decoration: const InputDecoration(labelText: 'Name'),
             ),
             TextField(
               controller: _priceController,
-              decoration: InputDecoration(labelText: 'Price'),
+              decoration: const InputDecoration(labelText: 'Price'),
               keyboardType: TextInputType.number,
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             _imageFile == null
-                ? Text('No image selected.')
+                ? const Text('No image selected.')
                 : Image.file(_imageFile!, height: 150),
             ElevatedButton(
               onPressed: () async {
                 _imageFile = await _menuService.pickImage();
                 setState(() {});
               },
-              child: Text('Pick Image'),
+              child: const Text('Pick Image'),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () async {
                 if (_imageFile != null) {
@@ -60,11 +62,11 @@ class _MenuScreenState extends State<MenuScreen> {
                   _nameController.clear();
                   _priceController.clear();
                   setState(() {
-                    late File _imageFile = File('');
+                    late File imageFile = File('');
                   });
                 }
               },
-              child: Text('Add Menu Item'),
+              child: const Text('Add Menu Item'),
             ),
           ],
         ),
