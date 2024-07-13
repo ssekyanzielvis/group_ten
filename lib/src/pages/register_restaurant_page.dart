@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-//import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get.dart';
+
+import '../models/restaurant_model.dart';
 
 class RegisterRestaurantPage extends StatefulWidget {
   const RegisterRestaurantPage({super.key});
@@ -10,6 +12,7 @@ class RegisterRestaurantPage extends StatefulWidget {
 }
 
 class _RegisterRestaurantPageState extends State<RegisterRestaurantPage> {
+  final restaurantRepo = Get.put(RestaurantRepository());
   final _formKey = GlobalKey<FormState>();
   late String _restaurantName, _password;
   bool _isLogin = false;
@@ -98,7 +101,6 @@ class _RegisterRestaurantPageState extends State<RegisterRestaurantPage> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 50, vertical: 15),
                         iconColor: Colors.deepOrange,
-                        disabledIconColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -121,29 +123,41 @@ class _RegisterRestaurantPageState extends State<RegisterRestaurantPage> {
     );
   }
 
-  void _registerRestaurant() {
-    FirebaseFirestore.instance.collection('restaurants').add({
-      'name': _restaurantName,
-      'password': _password,
-    }).then((value) {
+  Future<void> createRestaurant(Restaurant restaurant) async {
+    await restaurantRepo.createRestaurant(restaurant);
+  }
+
+  void _registerRestaurant() async {
+    try {
+      final docRef =
+          await FirebaseFirestore.instance.collection('restaurants').add({
+        'name': _restaurantName,
+        'password': _password,
+      });
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => RestaurantHomePage(
-            restaurantId: value.id,
+            restaurantId: docRef.id,
           ),
         ),
       );
-    });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Registration failed: $e')),
+      );
+    }
   }
 
-  void _loginRestaurant() {
-    FirebaseFirestore.instance
-        .collection('restaurants')
-        .where('name', isEqualTo: _restaurantName)
-        .where('password', isEqualTo: _password)
-        .get()
-        .then((snapshot) {
+  void _loginRestaurant() async {
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('restaurants')
+          .where('name', isEqualTo: _restaurantName)
+          .where('password', isEqualTo: _password)
+          .get();
+
       if (snapshot.docs.isNotEmpty) {
         Navigator.pushReplacement(
           context,
@@ -158,7 +172,11 @@ class _RegisterRestaurantPageState extends State<RegisterRestaurantPage> {
           const SnackBar(content: Text('Invalid restaurant name or password')),
         );
       }
-    });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Login failed: $e')),
+      );
+    }
   }
 }
 
@@ -193,6 +211,8 @@ class _RestaurantHomePageState extends State<RestaurantHomePage> {
                     decoration: const InputDecoration(
                       labelText: 'Food Name',
                       border: OutlineInputBorder(),
+                      filled: true,
+                      fillColor: Colors.white,
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -207,6 +227,8 @@ class _RestaurantHomePageState extends State<RestaurantHomePage> {
                     decoration: const InputDecoration(
                       labelText: 'Price',
                       border: OutlineInputBorder(),
+                      filled: true,
+                      fillColor: Colors.white,
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -232,6 +254,16 @@ class _RestaurantHomePageState extends State<RestaurantHomePage> {
                         });
                       }
                     },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 50,
+                        vertical: 15,
+                      ),
+                      iconColor: Colors.deepOrange,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
                     child: const Text('Add Food'),
                   ),
                 ],
@@ -251,9 +283,40 @@ class _RestaurantHomePageState extends State<RestaurantHomePage> {
                       itemCount: snapshot.data!.docs.length,
                       itemBuilder: (context, index) {
                         DocumentSnapshot food = snapshot.data!.docs[index];
-                        return ListTile(
-                          title: Text(food['name']),
-                          subtitle: Text('Price: \$${food['price']}'),
+                        return Container(
+                          margin: const EdgeInsets.symmetric(vertical: 8.0),
+                          padding: const EdgeInsets.all(16.0),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                spreadRadius: 2,
+                                blurRadius: 5,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                food['name'],
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                'UGX ${food['price']}',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.deepOrange,
+                                ),
+                              ),
+                            ],
+                          ),
                         );
                       },
                     );
@@ -269,5 +332,40 @@ class _RestaurantHomePageState extends State<RestaurantHomePage> {
         ),
       ),
     );
+  }
+}
+
+//import 'dart:nativewrappers/_internal/vm/lib/core_patch.dart';
+
+class RestaurantRepository extends GetxController {
+  static RestaurantRepository get instance => Get.find();
+
+  final _db = FirebaseFirestore.instance;
+
+  createRestaurant(Restaurant restaurant) async {
+    try {
+      await _db
+          .collection('restaurants')
+          .doc(restaurant.rid)
+          .set(restaurant.toJson())
+          .whenComplete(
+            () => Get.snackbar(
+              "Success",
+              "Mission Success",
+              snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: Colors.green.withOpacity(0.1),
+              colorText: Colors.blue,
+            ),
+          );
+    } catch (error) {
+      Get.snackbar(
+        "Error",
+        "Something Wrong happened. Please try again",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.withOpacity(0.1),
+        colorText: Colors.blue,
+      );
+      print(error.toString());
+    }
   }
 }

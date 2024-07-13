@@ -20,7 +20,7 @@ Future main() async {
             measurementId: "G-W8QQNJBS1W"));
   }
 
-  runApp(App());
+  runApp(const App());
 
   FlutterError.onError = (details) {
     FlutterError.presentError(details);
