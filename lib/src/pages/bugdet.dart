@@ -7,11 +7,13 @@ import 'dart:convert';
 class BudgetScreen extends StatelessWidget {
   final TextEditingController _budgetController = TextEditingController();
 
+  BudgetScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Enter Budget',
           style: TextStyle(
             fontSize: 20,
@@ -39,27 +41,27 @@ class BudgetScreen extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.monetization_on,
                       color: Colors.deepOrange,
                       size: 50,
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     TextField(
                       controller: _budgetController,
                       decoration: InputDecoration(
                         labelText: 'Budget Amount',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(
+                          borderSide: const BorderSide(
                             color: Colors.deepOrange,
                           ),
                         ),
-                        prefixIcon: Icon(Icons.attach_money),
+                        prefixIcon: const Icon(Icons.attach_money),
                       ),
                       keyboardType: TextInputType.number,
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     ElevatedButton.icon(
                       onPressed: () {
                         final budget = double.tryParse(_budgetController.text);
@@ -73,19 +75,19 @@ class BudgetScreen extends StatelessWidget {
                           );
                         }
                       },
-                      icon: Icon(Icons.search),
-                      label: Text('Submit'),
+                      icon: const Icon(Icons.search),
+                      label: const Text('Submit'),
                       style: ElevatedButton.styleFrom(
                         iconColor: Colors.deepOrange,
                         disabledIconColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        padding: EdgeInsets.symmetric(
+                        padding: const EdgeInsets.symmetric(
                           horizontal: 24,
                           vertical: 12,
                         ),
-                        textStyle: TextStyle(
+                        textStyle: const TextStyle(
                           fontSize: 16,
                         ),
                       ),
@@ -103,7 +105,7 @@ class BudgetScreen extends StatelessWidget {
 
 class FoodListScreen extends StatelessWidget {
   final double budget;
-  FoodListScreen({required this.budget});
+  FoodListScreen({super.key, required this.budget});
 
   final FirestoreService _firestoreService = FirestoreService();
 
@@ -111,7 +113,7 @@ class FoodListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Foods within Budget',
           style: TextStyle(
             fontSize: 20,
@@ -126,11 +128,11 @@ class FoodListScreen extends StatelessWidget {
         future: _firestoreService.getFoodsWithinBudget(budget),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(
+            return const Center(
                 child: Text('No foods available within this budget.'));
           } else {
             final foods = snapshot.data!;
@@ -151,21 +153,21 @@ class FoodListScreen extends StatelessWidget {
                         ),
                       ),
                       child: ListTile(
-                        leading: Icon(
+                        leading: const Icon(
                           Icons.fastfood,
                           color: Colors.deepOrange,
                           size: 40,
                         ),
                         title: Text(
                           food.name,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         subtitle: Text(
                           'Price: ${food.price}, Restaurant: ${food.restaurantName}',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 16,
                           ),
                         ),
@@ -193,7 +195,7 @@ class FoodListScreen extends StatelessWidget {
 class PaymentService {
   Future<void> processMobilePayment(double amount) async {
     // Mock URL for the mobile money payment API
-    final String apiUrl = 'https://mobile-money-api.example.com/pay';
+    const String apiUrl = 'https://mobile-money-api.example.com/pay';
 
     // Simulated request body
     final Map<String, dynamic> requestBody = {
@@ -253,7 +255,7 @@ class Food {
 
 class PaymentScreen extends StatelessWidget {
   final Food food;
-  PaymentScreen({required this.food});
+  PaymentScreen({super.key, required this.food});
 
   final PaymentService _paymentService = PaymentService();
 
@@ -269,7 +271,7 @@ class PaymentScreen extends StatelessWidget {
   void _processMobilePayment(BuildContext context) async {
     await _paymentService.processMobilePayment(food.price);
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Mobile payment processed')),
+      const SnackBar(content: Text('Mobile payment processed')),
     );
     Navigator.push(
       context,
@@ -285,7 +287,7 @@ class PaymentScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'Payment for ${food.name}',
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
             color: Colors.white,
@@ -300,14 +302,14 @@ class PaymentScreen extends StatelessWidget {
           children: [
             Text(
               'Choose payment method for ${food.name}',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: Colors.black87,
               ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () => _processCashPayment(context),
               style: ElevatedButton.styleFrom(
@@ -316,12 +318,12 @@ class PaymentScreen extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                padding: EdgeInsets.symmetric(
+                padding: const EdgeInsets.symmetric(
                   horizontal: 24,
                   vertical: 12,
                 ),
               ),
-              child: Row(
+              child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.money),
@@ -330,7 +332,7 @@ class PaymentScreen extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () => _processMobilePayment(context),
               style: ElevatedButton.styleFrom(
@@ -339,12 +341,12 @@ class PaymentScreen extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                padding: EdgeInsets.symmetric(
+                padding: const EdgeInsets.symmetric(
                   horizontal: 24,
                   vertical: 12,
                 ),
               ),
-              child: Row(
+              child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.phone_android),
@@ -362,13 +364,13 @@ class PaymentScreen extends StatelessWidget {
 
 class PaymentConfirmationScreen extends StatelessWidget {
   final Food food;
-  PaymentConfirmationScreen({required this.food});
+  const PaymentConfirmationScreen({super.key, required this.food});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Payment Confirmation',
           style: TextStyle(
             fontSize: 20,
@@ -396,38 +398,38 @@ class PaymentConfirmationScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.check_circle_outline,
                       color: Colors.green,
                       size: 100,
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     Text(
                       'Payment for ${food.name} has been processed successfully!',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     ElevatedButton.icon(
                       onPressed: () {
                         Navigator.popUntil(context, (route) => route.isFirst);
                       },
-                      icon: Icon(Icons.home),
-                      label: Text('Back to Home'),
+                      icon: const Icon(Icons.home),
+                      label: const Text('Back to Home'),
                       style: ElevatedButton.styleFrom(
                         iconColor: Colors.green,
                         disabledIconColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        padding: EdgeInsets.symmetric(
+                        padding: const EdgeInsets.symmetric(
                           horizontal: 24,
                           vertical: 12,
                         ),
-                        textStyle: TextStyle(
+                        textStyle: const TextStyle(
                           fontSize: 16,
                         ),
                       ),
@@ -446,10 +448,12 @@ class PaymentConfirmationScreen extends StatelessWidget {
 class LocationScreen extends StatelessWidget {
   final TextEditingController _locationController = TextEditingController();
 
+  LocationScreen({super.key});
+
   void _confirmDelivery(BuildContext context) {
     // Logic to confirm delivery and show the confirmation message
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Food will be delivered in 5 minutes')),
+      const SnackBar(content: Text('Food will be delivered in 5 minutes')),
     );
     // Navigate back or to the consumption screen
     Navigator.popUntil(context, (route) => route.isFirst);
@@ -459,7 +463,7 @@ class LocationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Enter Your Location',
           style: TextStyle(
             fontSize: 20,
@@ -484,7 +488,7 @@ class LocationScreen extends StatelessWidget {
                     color: Colors.grey.withOpacity(0.5),
                     spreadRadius: 5,
                     blurRadius: 7,
-                    offset: Offset(0, 3),
+                    offset: const Offset(0, 3),
                   ),
                 ],
               ),
@@ -495,11 +499,12 @@ class LocationScreen extends StatelessWidget {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0),
                   ),
-                  prefixIcon: Icon(Icons.location_on, color: Colors.deepOrange),
+                  prefixIcon:
+                      const Icon(Icons.location_on, color: Colors.deepOrange),
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () => _confirmDelivery(context),
               style: ElevatedButton.styleFrom(
@@ -508,15 +513,15 @@ class LocationScreen extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                padding: EdgeInsets.symmetric(
+                padding: const EdgeInsets.symmetric(
                   horizontal: 24,
                   vertical: 12,
                 ),
-                textStyle: TextStyle(
+                textStyle: const TextStyle(
                   fontSize: 16,
                 ),
               ),
-              child: Row(
+              child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.check_circle),
@@ -535,11 +540,13 @@ class LocationScreen extends StatelessWidget {
 class RecentConsumptionScreen extends StatelessWidget {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
+  RecentConsumptionScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Recent Food Consumption',
           style: TextStyle(
             fontSize: 20,
@@ -554,11 +561,11 @@ class RecentConsumptionScreen extends StatelessWidget {
         future: _db.collection('consumptions').get(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(child: Text('No recent consumptions.'));
+            return const Center(child: Text('No recent consumptions.'));
           } else {
             final consumptions = snapshot.data!.docs;
             return ListView.builder(
@@ -569,25 +576,26 @@ class RecentConsumptionScreen extends StatelessWidget {
 
                 return Card(
                   elevation: 3,
-                  margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: ListTile(
                     title: Text(
                       data['foodName'],
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     subtitle: Text(
                       'Consumed on: ${date.toLocal()}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 14,
                       ),
                     ),
-                    leading: Icon(
+                    leading: const Icon(
                       Icons.restaurant,
                       color: Colors.deepOrange,
                     ),
