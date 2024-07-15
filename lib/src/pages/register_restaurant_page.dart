@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 
 import '../models/restaurant_model.dart';
+import '../pages/bugdet.dart';
 
 class RegisterRestaurantPage extends StatefulWidget {
   const RegisterRestaurantPage({super.key});
@@ -198,6 +199,37 @@ class _RestaurantHomePageState extends State<RestaurantHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Restaurant Home Page'),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => NotificationScreen()),
+                );
+              },
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.deepOrange,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.notifications, color: Colors.white),
+                    SizedBox(width: 8),
+                    Text(
+                      'View Notifications',
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),

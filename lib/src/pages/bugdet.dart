@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
+import 'package:firebase_auth/firebase_auth.dart';
+
 import 'dart:convert';
 
 class BudgetScreen extends StatelessWidget {
@@ -105,7 +107,8 @@ class BudgetScreen extends StatelessWidget {
 
 class FoodListScreen extends StatelessWidget {
   final double budget;
-  FoodListScreen({super.key, required this.budget});
+
+  FoodListScreen({Key? key, required this.budget});
 
   final FirestoreService _firestoreService = FirestoreService();
 
@@ -133,55 +136,91 @@ class FoodListScreen extends StatelessWidget {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(
-                child: Text('No foods available within this budget.'));
+              child: Text('No foods available within this budget.'),
+            );
           } else {
             final foods = snapshot.data!;
             return SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
-                  children: foods.map((food) {
-                    return Container(
-                      margin: const EdgeInsets.symmetric(vertical: 10.0),
-                      padding: const EdgeInsets.all(16.0),
-                      decoration: BoxDecoration(
-                        color: Colors.orange[50],
-                        borderRadius: BorderRadius.circular(15),
-                        border: Border.all(
-                          color: Colors.deepOrange,
-                          width: 2,
-                        ),
-                      ),
-                      child: ListTile(
-                        leading: const Icon(
-                          Icons.fastfood,
-                          color: Colors.deepOrange,
-                          size: 40,
-                        ),
-                        title: Text(
-                          food.name,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                  children: [
+                    // Your food items displayed here
+                    ...foods.map((food) {
+                      return Container(
+                        margin: const EdgeInsets.symmetric(vertical: 10.0),
+                        padding: const EdgeInsets.all(16.0),
+                        decoration: BoxDecoration(
+                          color: Colors.orange[50],
+                          borderRadius: BorderRadius.circular(15),
+                          border: Border.all(
+                            color: Colors.deepOrange,
+                            width: 2,
                           ),
                         ),
-                        subtitle: Text(
-                          'Price: ${food.price}, Restaurant: ${food.restaurantName}',
-                          style: const TextStyle(
-                            fontSize: 16,
+                        child: ListTile(
+                          leading: const Icon(
+                            Icons.fastfood,
+                            color: Colors.deepOrange,
+                            size: 40,
                           ),
+                          title: Text(
+                            food.name,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          subtitle: Text(
+                            'Price: ${food.price}, Restaurant: ${food.restaurantName}',
+                            style: const TextStyle(
+                              fontSize: 16,
+                            ),
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PaymentScreen(food: food),
+                              ),
+                            );
+                          },
                         ),
-                        onTap: () {
+                      );
+                    }).toList(),
+
+                    // Button to navigate to RecentConsumptionScreen
+                    Container(
+                      margin: const EdgeInsets.symmetric(vertical: 20.0),
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => PaymentScreen(food: food),
+                              builder: (context) => RecentConsumptionScreen(),
                             ),
                           );
                         },
+                        style: ElevatedButton.styleFrom(
+                          iconColor: Colors.deepOrange,
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 15.0, horizontal: 20.0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15.0),
+                          ),
+                        ),
+                        child: const Text(
+                          'View Recent Consumption',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
-                    );
-                  }).toList(),
+                    ),
+                  ],
                 ),
               ),
             );
@@ -259,11 +298,14 @@ class PaymentScreen extends StatelessWidget {
 
   final PaymentService _paymentService = PaymentService();
 
-  void _processCashPayment(BuildContext context) {
+  void _processCashPayment(BuildContext context, Food food) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => LocationScreen(),
+        builder: (context) => LocationScreen(
+          name: food.name, // Use the actual food name
+          restaurantName: food.restaurantName, // Use the actual restaurant name
+        ),
       ),
     );
   }
@@ -311,7 +353,7 @@ class PaymentScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () => _processCashPayment(context),
+              onPressed: () => _processCashPayment(context, food),
               style: ElevatedButton.styleFrom(
                 iconColor: Colors.green,
                 disabledIconColor: Colors.white,
@@ -447,87 +489,98 @@ class PaymentConfirmationScreen extends StatelessWidget {
 
 class LocationScreen extends StatelessWidget {
   final TextEditingController _locationController = TextEditingController();
+  final String name;
+  final String restaurantName;
 
-  LocationScreen({super.key});
+  LocationScreen({super.key, required this.name, required this.restaurantName});
 
-  void _confirmDelivery(BuildContext context) {
-    // Logic to confirm delivery and show the confirmation message
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Food will be delivered in 5 minutes')),
-    );
-    // Navigate back or to the consumption screen
-    Navigator.popUntil(context, (route) => route.isFirst);
+  void _confirmDelivery(BuildContext context) async {
+    final User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      final String location = _locationController.text;
+      final String email = user.email!;
+      final DateTime now = DateTime.now();
+
+      await FirebaseFirestore.instance.collection('notifications').add({
+        'location': location,
+        'Food': name,
+        'restaurantName': restaurantName,
+        'email': email,
+        'timestamp': now,
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Food will be delivered in 5 minutes')),
+      );
+
+      // Navigate back or to the consumption screen
+      Navigator.popUntil(context, (route) => route.isFirst);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User not logged in')),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Enter Your Location',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
+        title: const Text('Enter Your Location'),
         backgroundColor: Colors.deepOrange,
-        centerTitle: true,
       ),
-      body: SingleChildScrollView(
+      body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Colors.orange[100],
                 borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 5,
-                    blurRadius: 7,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
               ),
               child: TextField(
                 controller: _locationController,
                 decoration: InputDecoration(
-                  labelText: 'Your Location',
+                  labelText: 'Location',
+                  labelStyle: const TextStyle(color: Colors.deepOrange),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0),
                   ),
-                  prefixIcon:
-                      const Icon(Icons.location_on, color: Colors.deepOrange),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(color: Colors.deepOrange),
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
                 ),
               ),
             ),
             const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () => _confirmDelivery(context),
-              style: ElevatedButton.styleFrom(
-                iconColor: Colors.deepOrange,
-                disabledIconColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+            Center(
+              child: ElevatedButton(
+                onPressed: () => _confirmDelivery(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepOrange,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                  textStyle: const TextStyle(
+                    fontSize: 16,
+                  ),
                 ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.check_circle),
+                    SizedBox(width: 10),
+                    Text('Confirm Delivery'),
+                  ],
                 ),
-                textStyle: const TextStyle(
-                  fontSize: 16,
-                ),
-              ),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.check_circle),
-                  SizedBox(width: 10),
-                  Text('Confirm Delivery'),
-                ],
               ),
             ),
           ],
@@ -572,7 +625,23 @@ class RecentConsumptionScreen extends StatelessWidget {
               itemCount: consumptions.length,
               itemBuilder: (context, index) {
                 final data = consumptions[index].data() as Map<String, dynamic>;
-                final date = (data['date'] as Timestamp).toDate();
+
+                // Ensure 'food' field exists and is not null
+                final food = data['name'] as String? ?? 'Unknown Food';
+
+                // Ensure 'date' field exists and is not null
+                final dynamic dateData = data['date'];
+                DateTime date;
+
+                // Handling different date formats
+                if (dateData is Timestamp) {
+                  date = dateData.toDate();
+                } else if (dateData is int) {
+                  date = DateTime.fromMillisecondsSinceEpoch(dateData);
+                } else {
+                  // Default to current date and time if format is unknown
+                  date = DateTime.now();
+                }
 
                 return Card(
                   elevation: 3,
@@ -583,7 +652,7 @@ class RecentConsumptionScreen extends StatelessWidget {
                   ),
                   child: ListTile(
                     title: Text(
-                      data['foodName'],
+                      food,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -598,6 +667,290 @@ class RecentConsumptionScreen extends StatelessWidget {
                     leading: const Icon(
                       Icons.restaurant,
                       color: Colors.deepOrange,
+                    ),
+                  ),
+                );
+              },
+            );
+          }
+        },
+      ),
+    );
+  }
+}
+
+class NotificationScreen extends StatelessWidget {
+  final String? notificationId;
+
+  const NotificationScreen({super.key, this.notificationId});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Notifications'),
+        backgroundColor: Colors.deepOrange,
+      ),
+      body: StreamBuilder<QuerySnapshot>(
+        stream:
+            FirebaseFirestore.instance.collection('notifications').snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return const Center(child: Text('No notifications available.'));
+          } else {
+            final notifications = snapshot.data!.docs;
+            return ListView.builder(
+              itemCount: notifications.length,
+              itemBuilder: (context, index) {
+                final data =
+                    notifications[index].data() as Map<String, dynamic>;
+                final date = (data['timestamp'] as Timestamp).toDate();
+                final String food = data['Food'] ?? 'Unknown Food';
+                final String restaurantName =
+                    data['restaurantName'] ?? 'Unknown Restaurant';
+                final String location = data['location'] ?? 'Unknown Location';
+                final String email = data['email'] ?? 'Unknown Email';
+
+                return Card(
+                  elevation: 3,
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ListTile(
+                    title: Text(food),
+                    subtitle: Text(
+                      'Restaurant: $restaurantName\n'
+                      'Customer Location: $location\n'
+                      'Customer Email: $email\n'
+                      'Ordered on: ${date.toLocal()}',
+                    ),
+                    leading: const Icon(
+                      Icons.notifications,
+                      color: Colors.deepOrange,
+                    ),
+                    trailing: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Tap to send message to customer.',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        SizedBox(width: 5),
+                        Icon(
+                          Icons.message,
+                          color: Colors.deepOrange,
+                        ),
+                      ],
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MessageScreen(
+                              notificationId: notifications[index].id),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
+            );
+          }
+        },
+      ),
+    );
+  }
+}
+
+class MessageScreen extends StatelessWidget {
+  final String notificationId;
+  final TextEditingController _messageController = TextEditingController();
+
+  MessageScreen({super.key, required this.notificationId});
+
+  void _sendMessage(BuildContext context) async {
+    final String message = _messageController.text;
+
+    if (message.isNotEmpty) {
+      await FirebaseFirestore.instance.collection('messages').add({
+        'notificationId': notificationId,
+        'message': message,
+        'timestamp': DateTime.now(),
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Message sent')),
+      );
+
+      // Navigate back to notifications screen
+      Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Message cannot be empty')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Send a Message'),
+        backgroundColor: Colors.deepOrange,
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.orange[100],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: TextField(
+                  controller: _messageController,
+                  maxLines: 5,
+                  decoration: InputDecoration(
+                    labelText: 'Type your message',
+                    labelStyle: const TextStyle(color: Colors.deepOrange),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(color: Colors.deepOrange),
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Center(
+                child: ElevatedButton(
+                  onPressed: () => _sendMessage(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepOrange,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
+                    ),
+                    textStyle: const TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.send),
+                      SizedBox(width: 10),
+                      Text('Send Message'),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class MessagesPage extends StatelessWidget {
+  const MessagesPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Messages'),
+        backgroundColor: Colors.deepOrange,
+      ),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('messages')
+            .orderBy('timestamp', descending: true)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return const Center(child: Text('No messages available.'));
+          } else {
+            final messages = snapshot.data!.docs;
+            return ListView.builder(
+              itemCount: messages.length,
+              itemBuilder: (context, index) {
+                final data = messages[index].data() as Map<String, dynamic>;
+                final date = (data['timestamp'] as Timestamp).toDate();
+                final message = data['message'];
+
+                return Card(
+                  elevation: 3,
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.orange[50],
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 2,
+                          blurRadius: 5,
+                          offset:
+                              const Offset(0, 3), // changes position of shadow
+                        ),
+                      ],
+                    ),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 10),
+                      title: Text(
+                        message,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      subtitle: Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          'Sent on: ${date.toLocal()}',
+                          style:
+                              const TextStyle(color: Colors.grey, fontSize: 14),
+                        ),
+                      ),
+                      leading: Container(
+                        padding: const EdgeInsets.all(8.0),
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.deepOrange,
+                        ),
+                        child: const Icon(
+                          Icons.message,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ),
                 );

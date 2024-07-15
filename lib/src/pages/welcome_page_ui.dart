@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../pages/bugdet.dart';
+
+import 'bugdet.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -144,6 +145,30 @@ class _WelcomePageState extends State<WelcomePage> {
                   textAlign: TextAlign.center,
                 ),
               ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green, // background color
+                foregroundColor: Colors.white, // text color
+                shadowColor: Colors.black, // shadow color
+                elevation: 5, // elevation
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10), // rounded corners
+                ),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 10, vertical: 5), // padding
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          MessagesPage()), // removed the notificationId parameter as it's not required here
+                );
+              },
+              child: const Text('View Messages from restaurants',
+                  style: TextStyle(fontSize: 12)), // text style
             ),
           ],
         ),
