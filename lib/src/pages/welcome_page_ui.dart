@@ -164,7 +164,7 @@ class _WelcomePageState extends State<WelcomePage> {
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          MessagesPage()), // removed the notificationId parameter as it's not required here
+                          const MessagesPage()), // removed the notificationId parameter as it's not required here
                 );
               },
               child: const Text('View Messages from restaurants',

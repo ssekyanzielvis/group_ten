@@ -1,19 +1,33 @@
 class User {
-  String uid;
-  String name;
-  String email;
-  String photoUrl;
-  String location;
-  String phoneNumber;
+  final String uid;
+  final String name;
+  final String email;
+  final String photoUrl;
+  final String dob;
+  final String location;
+  final String phoneNumber;
 
   User({
     required this.uid,
     required this.name,
     required this.email,
     required this.photoUrl,
+    required this.dob,
     required this.location,
     required this.phoneNumber,
   });
+
+  factory User.fromMap(Map<String, dynamic> data) {
+    return User(
+      uid: data['uid'] as String,
+      name: data['name'] as String,
+      email: data['email'] as String,
+      photoUrl: data['photoUrl'] as String,
+      dob: data['dob'] as String,
+      location: data['location'] as String,
+      phoneNumber: data['phoneNumber'] as String,
+    );
+  }
 
   Map<String, dynamic> toMap() {
     return {
@@ -21,30 +35,13 @@ class User {
       'name': name,
       'email': email,
       'photoUrl': photoUrl,
+      'dob': dob,
       'location': location,
       'phoneNumber': phoneNumber,
     };
   }
 
-  factory User.fromMap(Map<String, dynamic> map) {
-    return User(
-      uid: map['uid'] ?? '',
-      name: map['name'] ?? '',
-      email: map['email'] ?? '',
-      photoUrl: map['photoUrl'] ?? '',
-      location: map['location'] ?? '',
-      phoneNumber: map['phoneNumber'] ?? '',
-    );
-  }
-
-  toJson() {
-    return {
-      'uid': uid,
-      'name': name,
-      'email': email,
-      'photoUrl': photoUrl,
-      'location': location,
-      'phoneNumber': phoneNumber,
-    };
+  Map<String, dynamic> toJson() {
+    return toMap();
   }
 }

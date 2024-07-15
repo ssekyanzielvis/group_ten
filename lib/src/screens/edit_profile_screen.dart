@@ -4,11 +4,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_model.dart' as UserModel;
+import 'package:firebase_storage/firebase_storage.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _EditProfileScreenState createState() => _EditProfileScreenState();
 }
 
@@ -21,6 +23,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final TextEditingController _locationController = TextEditingController();
   final TextEditingController _dobController = TextEditingController();
   File? _profileImage;
+  final String _uploadedImageUrl = '';
 
   Future<void> _pickImage() async {
     final pickedFile =
@@ -51,6 +54,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         _nameController.text = userProfile.name;
         _emailController.text = userProfile.email;
         _photoUrlController.text = userProfile.photoUrl;
+        _dobController.text = userProfile.dob; // Add this line
         _locationController.text = userProfile.location;
         _phoneController.text = userProfile.phoneNumber;
       }
@@ -65,7 +69,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           uid: user.uid,
           name: _nameController.text,
           email: _emailController.text,
-          photoUrl: _photoUrlController.text,
+          photoUrl: imageUrl ?? _uploadedImageUrl,
+          dob: _dobController.text, // Add this line
           location: _locationController.text,
           phoneNumber: _phoneController.text,
         );
@@ -82,6 +87,26 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         Navigator.pop(context);
       }
     }
+  }
+
+  String? imageUrl = '';
+
+  Future<String?> _uploadImageToFirebase() async {
+    String imageUrl = '';
+
+    if (_profileImage != null) {
+      try {
+        Reference ref = FirebaseStorage.instance.ref().child(
+            'user_profile_images/${DateTime.now().millisecondsSinceEpoch}');
+        UploadTask uploadTask = ref.putFile(_profileImage!);
+        TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() {});
+        imageUrl = await taskSnapshot.ref.getDownloadURL();
+      } catch (e) {
+        print('Error uploading image to Firebase Storage: $e');
+      }
+    }
+
+    return imageUrl;
   }
 
   @override
@@ -109,7 +134,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         : null,
                     backgroundColor: Colors.grey.shade300,
                     child: _profileImage == null
-                        ? const Icon(Icons.add_a_photo, size: 50, color: Colors.white)
+                        ? const Icon(Icons.add_a_photo,
+                            size: 50, color: Colors.white)
                         : null,
                   ),
                 ),
@@ -152,7 +178,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   onPressed: _saveProfile,
                   style: ElevatedButton.styleFrom(
                     iconColor: Colors.blue,
-                    padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 50, vertical: 15),
                     textStyle: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,

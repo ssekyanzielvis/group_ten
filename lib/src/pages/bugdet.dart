@@ -108,7 +108,7 @@ class BudgetScreen extends StatelessWidget {
 class FoodListScreen extends StatelessWidget {
   final double budget;
 
-  FoodListScreen({Key? key, required this.budget});
+  FoodListScreen({super.key, required this.budget});
 
   final FirestoreService _firestoreService = FirestoreService();
 
@@ -158,36 +158,50 @@ class FoodListScreen extends StatelessWidget {
                             width: 2,
                           ),
                         ),
-                        child: ListTile(
-                          leading: const Icon(
-                            Icons.fastfood,
-                            color: Colors.deepOrange,
-                            size: 40,
-                          ),
-                          title: Text(
-                            food.name,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          subtitle: Text(
-                            'Price: ${food.price}, Restaurant: ${food.restaurantName}',
-                            style: const TextStyle(
-                              fontSize: 16,
-                            ),
-                          ),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PaymentScreen(food: food),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ListTile(
+                              leading: const Icon(
+                                Icons.fastfood,
+                                color: Colors.deepOrange,
+                                size: 40,
                               ),
-                            );
-                          },
+                              title: Text(
+                                food.name,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              subtitle: Text(
+                                'Price: ${food.price}, Restaurant: ${food.restaurantName}',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                ),
+                              ),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        PaymentScreen(food: food),
+                                  ),
+                                );
+                              },
+                            ),
+                            const SizedBox(height: 10),
+                            const Text(
+                              'Tap To Make Order',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
                         ),
                       );
-                    }).toList(),
+                    }),
 
                     // Button to navigate to RecentConsumptionScreen
                     Container(
@@ -203,7 +217,6 @@ class FoodListScreen extends StatelessWidget {
                           );
                         },
                         style: ElevatedButton.styleFrom(
-                          iconColor: Colors.deepOrange,
                           padding: const EdgeInsets.symmetric(
                               vertical: 15.0, horizontal: 20.0),
                           shape: RoundedRectangleBorder(
@@ -312,10 +325,12 @@ class PaymentScreen extends StatelessWidget {
 
   void _processMobilePayment(BuildContext context) async {
     await _paymentService.processMobilePayment(food.price);
+    // ignore: use_build_context_synchronously
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Mobile payment processed')),
     );
     Navigator.push(
+      // ignore: use_build_context_synchronously
       context,
       MaterialPageRoute(
         builder: (context) => PaymentConfirmationScreen(food: food),
@@ -510,11 +525,13 @@ class LocationScreen extends StatelessWidget {
         'timestamp': now,
       });
 
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Food will be delivered in 5 minutes')),
       );
 
       // Navigate back or to the consumption screen
+      // ignore: use_build_context_synchronously
       Navigator.popUntil(context, (route) => route.isFirst);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
