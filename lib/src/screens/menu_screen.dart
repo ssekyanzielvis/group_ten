@@ -10,11 +10,6 @@ class MenuScreen extends StatefulWidget {
   _MenuScreenState createState() => _MenuScreenState();
 }
 
-class _MenuScreenState extends State<MenuScreen> {
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _priceController = TextEditingController();
-  final MenuService _menuService = MenuService();
-  File? _imageFile;
 
   @override
   Widget build(BuildContext context) {
