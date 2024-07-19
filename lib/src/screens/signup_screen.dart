@@ -1,40 +1,38 @@
+import 'package:firebase_auth_platform_interface/firebase_auth_platform_interface.dart';
 import 'package:flutter/material.dart';
 import '../widgets/auth_service.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
-class SignupScreen extends StatefulWidget {
-  const SignupScreen({super.key});
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
 
   @override
-  _SignupScreenState createState() => _SignupScreenState();
+  _SignUpScreenState createState() => _SignUpScreenState();
 }
 
-class _SignupScreenState extends State<SignupScreen> {
+class _SignUpScreenState extends State<SignUpScreen> {
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneNumberController = TextEditingController();
+  final TextEditingController _dobController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final AuthService _authService = AuthService();
   String? errorMessage = '';
 
-  Future<void> createUserWithEmailAndPassword() async {
+  Future<void> signUp() async {
     try {
       await _authService.signUp(
-          _emailController.text, _passwordController.text);
-      Navigator.pop(context);
+        _nameController.text,
+        _emailController.text,
+        _passwordController.text,
+        _phoneNumberController.text,
+        _dobController.text,
+      );
+      Navigator.pushReplacementNamed(context, '/home');
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = e.message;
       });
     }
-  }
-
-  Widget _title() {
-    return const Text(
-      'Sign Up',
-      style: TextStyle(
-        fontSize: 24,
-        fontWeight: FontWeight.bold,
-      ),
-    );
   }
 
   Widget _entryField(String title, TextEditingController controller,
@@ -51,7 +49,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
   Widget _errorMessage() {
     return Text(
-      errorMessage ?? 'Failed due to incorrect data',
+      errorMessage ?? '',
       style: const TextStyle(
         color: Colors.red,
       ),
@@ -60,19 +58,25 @@ class _SignupScreenState extends State<SignupScreen> {
 
   Widget _submitButton() {
     return ElevatedButton(
-      onPressed: createUserWithEmailAndPassword,
+      onPressed: signUp,
       style: ElevatedButton.styleFrom(
-        iconColor: Colors.orange,
+        backgroundColor: const Color(0xFF1877F2), // Facebook blue
         padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
         textStyle: const TextStyle(fontSize: 18),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
       ),
-      child: const Text('Sign Up'),
+      child: const Text('Sign Up', style: TextStyle(color: Colors.white)),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Sign Up'),
+        backgroundColor: const Color(0xFF1877F2), // Facebook blue
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Center(
@@ -80,15 +84,13 @@ class _SignupScreenState extends State<SignupScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                const Icon(
-                  Icons.fastfood,
-                  size: 100.0,
-                  color: Colors.orange,
-                ),
-                const SizedBox(height: 50.0),
-                _title(),
+                _entryField('Name', _nameController),
                 const SizedBox(height: 20.0),
                 _entryField('Email', _emailController),
+                const SizedBox(height: 20.0),
+                _entryField('Phone Number', _phoneNumberController),
+                const SizedBox(height: 20.0),
+                _entryField('Date of Birth', _dobController),
                 const SizedBox(height: 20.0),
                 _entryField('Password', _passwordController, isPassword: true),
                 const SizedBox(height: 20.0),
@@ -97,12 +99,10 @@ class _SignupScreenState extends State<SignupScreen> {
                 _submitButton(),
                 TextButton(
                   onPressed: () {
-                    Navigator.pop(context);
+                    Navigator.pushReplacementNamed(context, '/login');
                   },
-                  child: const Text(
-                    'Already have an account? Login',
-                    style: TextStyle(color: Colors.blue),
-                  ),
+                  child: const Text("Already have an account? Login",
+                      style: TextStyle(color: Color(0xFF1877F2))),
                 ),
               ],
             ),
@@ -114,7 +114,10 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   void dispose() {
+    _nameController.dispose();
     _emailController.dispose();
+    _phoneNumberController.dispose();
+    _dobController.dispose();
     _passwordController.dispose();
     super.dispose();
   }

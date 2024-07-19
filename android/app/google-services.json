@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "540760942496",
+    "project_id": "food-delivery-fc9ed",
+    "storage_bucket": "food-delivery-fc9ed.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:540760942496:android:e9d3a48130c1a5f2cfe6c5",
+        "android_client_info": {
+          "package_name": "com.example.fooddash"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "540760942496-gn66n98coc9dub5dumblroft6gb8pk22.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.fooddash",
+            "certificate_hash": "fe4cafe3b753de6aa5efaad56e87c6918eefbf85"
+          }
+        },
+        {
+          "client_id": "540760942496-jssatidm968d547boj6rtt7rdq9gj6ai.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBcB4GNw7iaAQJ_oLMmnoy4cCn8ATM-s4A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "540760942496-jssatidm968d547boj6rtt7rdq9gj6ai.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "540760942496-nb86rbllko61nlojbc3vqfp61gvqb9rq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.foodDash.RunnerTests"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

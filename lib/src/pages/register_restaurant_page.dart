@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 import '../models/restaurant_model.dart';
 import '../pages/bugdet.dart';
+import 'calculator.dart';
 
 class RegisterRestaurantPage extends StatefulWidget {
   const RegisterRestaurantPage({super.key});
@@ -206,7 +207,8 @@ class _RestaurantHomePageState extends State<RestaurantHomePage> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const NotificationScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => const NotificationScreen()),
                 );
               },
               child: Container(
@@ -297,6 +299,30 @@ class _RestaurantHomePageState extends State<RestaurantHomePage> {
                       ),
                     ),
                     child: const Text('Add Food'),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const CalculatorScreen()),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 50,
+                        vertical: 15,
+                      ),
+                      iconColor: Colors.deepPurple,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: const Text(
+                      'Make Calculations',
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
                   ),
                 ],
               ),

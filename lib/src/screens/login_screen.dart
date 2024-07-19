@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:food_dash/src/screens/signup_screen.dart';
 import '../widgets/auth_service.dart';
-import 'signup_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -12,15 +12,18 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   String? errorMessage = '';
-  bool isLogin = true;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _phoneNumberController = TextEditingController();
+  final TextEditingController _dobController = TextEditingController();
   final AuthService _authService = AuthService();
 
   Future<void> signInWithEmailAndPassword() async {
     try {
       await _authService.signIn(
           _emailController.text, _passwordController.text);
+      Navigator.pushReplacementNamed(context, '/home');
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = e.message;
@@ -28,25 +31,21 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future<void> createUserWithEmailAndPassword() async {
+  Future<void> signInWithGoogle() async {
     try {
-      await _authService.signUp(
-          _emailController.text, _passwordController.text);
-    } on FirebaseAuthException catch (e) {
+      User? user = await _authService.signInWithGoogle();
+      if (user != null) {
+        Navigator.pushReplacementNamed(context, '/home');
+      } else {
+        setState(() {
+          errorMessage = 'Failed to sign in with Google';
+        });
+      }
+    } catch (e) {
       setState(() {
-        errorMessage = e.message;
+        errorMessage = e.toString();
       });
     }
-  }
-
-  Widget _title() {
-    return const Text(
-      'Login',
-      style: TextStyle(
-        fontSize: 24,
-        fontWeight: FontWeight.bold,
-      ),
-    );
   }
 
   Widget _entryField(String title, TextEditingController controller,
@@ -72,29 +71,46 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _submitButton() {
     return ElevatedButton(
-      onPressed:
-          isLogin ? signInWithEmailAndPassword : createUserWithEmailAndPassword,
+      onPressed: signInWithEmailAndPassword,
       style: ElevatedButton.styleFrom(
-        iconColor: Colors.orange,
+        backgroundColor: const Color(0xFF1877F2), // Facebook blue
         padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
         textStyle: const TextStyle(fontSize: 18),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
       ),
-      child: Text(isLogin ? 'Login' : 'Sign Up'),
+      child: const Text('Login', style: TextStyle(color: Colors.white)),
     );
   }
 
-  Widget _loginOrSignUpButton() {
-    return TextButton(
+  Widget _facebookButton() {
+    return ElevatedButton.icon(
       onPressed: () {
-        setState(() {
-          isLogin = !isLogin;
-        });
+        // Implement Facebook login logic here
       },
-      child: Text(
-        isLogin ? 'Sign Up' : 'Login',
-        style: const TextStyle(
-          color: Colors.blue,
-        ),
+      icon: const Icon(Icons.fastfood, color: Colors.white),
+      label: const Text('Log In with Facebook'),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF1877F2), // Facebook blue
+        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+        textStyle: const TextStyle(fontSize: 18),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
+      ),
+    );
+  }
+
+  Widget _googleButton() {
+    return ElevatedButton.icon(
+      onPressed: signInWithGoogle,
+      icon: const Icon(Icons.fastfood, color: Colors.white),
+      label: const Text('Log In with Google'),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFFDB4437), // Google red
+        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+        textStyle: const TextStyle(fontSize: 18),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
       ),
     );
   }
@@ -102,6 +118,10 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Login'),
+        backgroundColor: const Color(0xFF1877F2), // Facebook blue
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Center(
@@ -109,14 +129,6 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                const Icon(
-                  Icons.fastfood,
-                  size: 100.0,
-                  color: Colors.orange,
-                ),
-                const SizedBox(height: 50.0),
-                _title(),
-                const SizedBox(height: 20.0),
                 _entryField('Email', _emailController),
                 const SizedBox(height: 20.0),
                 _entryField('Password', _passwordController, isPassword: true),
@@ -124,50 +136,32 @@ class _LoginScreenState extends State<LoginScreen> {
                 _errorMessage(),
                 const SizedBox(height: 20.0),
                 _submitButton(),
-                _loginOrSignUpButton(),
-                const SizedBox(height: 20.0),
                 TextButton(
                   onPressed: () {
-                    _ForgotPasswordScreenState createState() =>
-                        _ForgotPasswordScreenState();
-                    // Handle forgot password action
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const SignUpScreen()),
+                    );
                   },
-                  child: const Text('Forgot Password?'),
-                ),
-                const Divider(),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    void signInWithGoogle() async {
-                      User? user = await _authService.signInWithGoogle();
-                      if (user != null) {
-                        Navigator.pushReplacementNamed(context, '/home');
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Failed to sign in with Google')),
-                        );
-                      }
-                    }
-
-                    // Handle login with FoodApp action
-                  },
-                  icon: const Icon(Icons.fastfood, color: Colors.white),
-                  label: const Text('Log In with Google'),
-                  style: ElevatedButton.styleFrom(
-                    iconColor: Colors.blueAccent,
-                    padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                    textStyle: const TextStyle(fontSize: 18),
-                  ),
+                  child: const Text("You're new? Sign Up",
+                      style: TextStyle(color: Color(0xFF1877F2))),
                 ),
                 TextButton(
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const SignupScreen()),
+                      MaterialPageRoute(
+                          builder: (context) => const ForgotPasswordScreen()),
                     );
                   },
-                  child: const Text('Sign Up'),
+                  child: const Text("Forgot password? Recover your account",
+                      style: TextStyle(color: Color(0xFF1877F2))),
                 ),
+                const Divider(),
+                _facebookButton(),
+                const SizedBox(height: 10.0),
+                _googleButton(),
               ],
             ),
           ),
@@ -180,6 +174,9 @@ class _LoginScreenState extends State<LoginScreen> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _nameController.dispose();
+    _phoneNumberController.dispose();
+    _dobController.dispose();
     super.dispose();
   }
 }
@@ -193,7 +190,7 @@ class ForgotPasswordScreen extends StatefulWidget {
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final TextEditingController _emailController = TextEditingController();
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final AuthService _authService = AuthService();
 
   void _sendPasswordResetEmail() async {
     String email = _emailController.text.trim();
@@ -206,7 +203,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     }
 
     try {
-      await _firebaseAuth.sendPasswordResetEmail(email: email);
+      await _authService.resetPassword(email);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Password reset email sent')),
       );
