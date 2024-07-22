@@ -4,7 +4,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'bugdet.dart';
 
 class MessageInputScreen extends StatelessWidget {
-  const MessageInputScreen({super.key});
+  final String inputMessageId;
+  final String notificationId;
+  const MessageInputScreen({
+    super.key,
+    required String messageId,
+    required this.notificationId,
+    required String message,
+    DateTime? timestamp,
+    required this.inputMessageId,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -151,6 +160,8 @@ class MessageListScreen extends StatelessWidget {
                     MaterialPageRoute(
                       builder: (context) => MessageScreen(
                         notificationId: '',
+                        messageId: '',
+                        message: '',
                       ),
                     ),
                   );

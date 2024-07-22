@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:food_dash/src/app.dart';
-
 import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,6 +25,11 @@ Future main() async {
     FlutterError.presentError(details);
     if (kReleaseMode) exit(1);
   };
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+}
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  print("Handling a background message: ${message.messageId}");
 }
 
 //void main() {

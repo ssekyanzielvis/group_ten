@@ -1,11 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-
 import 'package:firebase_auth/firebase_auth.dart';
-
 import 'dart:convert';
 import '../pages/messages_reply.dart';
+import 'calculator.dart';
 
 class BudgetScreen extends StatelessWidget {
   final TextEditingController _budgetController = TextEditingController();
@@ -91,6 +90,25 @@ class BudgetScreen extends StatelessWidget {
                           vertical: 12,
                         ),
                         textStyle: const TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const CalculatorScreen(),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        'Tap to make Calculations',
+                        style: TextStyle(
+                          color: Colors.deepOrange,
+                          decoration: TextDecoration.underline,
                           fontSize: 16,
                         ),
                       ),
@@ -774,7 +792,10 @@ class NotificationScreen extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) => MessageScreen(
-                              notificationId: notifications[index].id),
+                            notificationId: notifications[index].id,
+                            messageId: '',
+                            message: '',
+                          ),
                         ),
                       );
                     },
@@ -790,10 +811,20 @@ class NotificationScreen extends StatelessWidget {
 }
 
 class MessageScreen extends StatelessWidget {
+  final String messageId;
+  final String message;
+  final DateTime? timestamp;
   final String notificationId;
   final TextEditingController _messageController = TextEditingController();
 
-  MessageScreen({super.key, required this.notificationId});
+  // Unified constructor
+  MessageScreen({
+    super.key,
+    required this.messageId,
+    required this.message,
+    this.timestamp,
+    required this.notificationId,
+  });
 
   void _sendMessage(BuildContext context) async {
     final String message = _messageController.text;
@@ -802,6 +833,7 @@ class MessageScreen extends StatelessWidget {
       await FirebaseFirestore.instance.collection('messages').add({
         'notificationId': notificationId,
         'message': message,
+        'Message ID': messageId,
         'timestamp': DateTime.now(),
       });
 
@@ -809,7 +841,7 @@ class MessageScreen extends StatelessWidget {
         const SnackBar(content: Text('Message sent')),
       );
 
-      // Navigate back to notifications screen
+      // Navigate back to the previous screen
       Navigator.pop(context);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -828,100 +860,98 @@ class MessageScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.orange[100],
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: TextField(
-                    controller: _messageController,
-                    maxLines: 5,
-                    decoration: InputDecoration(
-                      labelText: 'Type your message',
-                      labelStyle: const TextStyle(color: Colors.deepOrange),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Colors.deepOrange),
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.orange[100],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: TextField(
+                  controller: _messageController,
+                  maxLines: 5,
+                  decoration: InputDecoration(
+                    labelText: 'Type your message',
+                    labelStyle: const TextStyle(color: Colors.deepOrange),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(color: Colors.deepOrange),
+                      borderRadius: BorderRadius.circular(10.0),
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: () => _sendMessage(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepOrange,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
-                      ),
-                      textStyle: const TextStyle(
-                        fontSize: 16,
-                      ),
+              ),
+              const SizedBox(height: 20),
+              Center(
+                child: ElevatedButton(
+                  onPressed: () => _sendMessage(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepOrange,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.send),
-                        SizedBox(width: 10),
-                        Text('Send Message'),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
+                    ),
+                    textStyle: const TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.send),
+                      SizedBox(width: 10),
+                      Text('Send Message'),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Center(
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MessageListScreen(),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.deepOrange,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 2,
+                          blurRadius: 5,
+                          offset: const Offset(0, 3),
+                        ),
                       ],
                     ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Center(
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const MessageListScreen(),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.deepOrange,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            spreadRadius: 2,
-                            blurRadius: 5,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: const Text(
-                        'Tap To View Customer Replies',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    child: const Text(
+                      'Tap To View Customer Replies',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -931,6 +961,13 @@ class MessageScreen extends StatelessWidget {
 
 class MessagesPage extends StatelessWidget {
   const MessagesPage({super.key});
+
+  void _markAsRead(String messageId) async {
+    await FirebaseFirestore.instance
+        .collection('messages')
+        .doc(messageId)
+        .update({'isRead': true});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -956,17 +993,43 @@ class MessagesPage extends StatelessWidget {
             return ListView.builder(
               itemCount: messages.length,
               itemBuilder: (context, index) {
-                final data = messages[index].data() as Map<String, dynamic>;
+                final Map<String, dynamic> data =
+                    snapshot.data!.docs[index].data() as Map<String, dynamic>;
+                final String notificationId =
+                    data['notificationId'] as String? ??
+                        'Unknown Notification ID';
+                final messageDoc = messages[index];
                 final date = (data['timestamp'] as Timestamp?)?.toDate();
                 final message =
                     data['message'] as String? ?? 'No message content';
+                final messageId = messages[index].id;
 
                 return InkWell(
-                  onTap: () {
+                  onTap: () async {
+                    _markAsRead(messageId);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const MessageInputScreen(),
+                        builder: (context) => MessageInputScreen(
+                          messageId: messageId,
+                          message: message,
+                          notificationId: notificationId,
+                          timestamp: date,
+                          inputMessageId: '',
+                        ),
+                      ),
+                    );
+                    // Mark the message as read
+                    await FirebaseFirestore.instance
+                        .collection('messages')
+                        .doc(messageDoc.id)
+                        .update({'isRead': true});
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            MessageDetailPage(message: message),
                       ),
                     );
                   },
@@ -1046,6 +1109,36 @@ class MessagesPage extends StatelessWidget {
             );
           }
         },
+      ),
+    );
+  }
+}
+
+class MessageDetailPage extends StatelessWidget {
+  final String message;
+
+  const MessageDetailPage({super.key, required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Message Details'),
+        backgroundColor: Colors.deepOrange,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              message,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            // Additional message details can be displayed here
+          ],
+        ),
       ),
     );
   }

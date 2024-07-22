@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-
-import 'bugdet.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'package:intl/intl.dart';
+import 'bugdet.dart';
 import '../screens/login_screen.dart';
 import '../pages/register_restaurant_page.dart';
-import 'package:intl/intl.dart';
+// import your MessagesPage
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
@@ -17,11 +16,30 @@ class WelcomePage extends StatefulWidget {
 
 class _WelcomePageState extends State<WelcomePage> {
   final _budgetController = TextEditingController();
+  int newMessageCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _listenForMessages();
+  }
 
   @override
   void dispose() {
     _budgetController.dispose();
     super.dispose();
+  }
+
+  void _listenForMessages() {
+    FirebaseFirestore.instance
+        .collection('messages')
+        .where('isRead', isEqualTo: false)
+        .snapshots()
+        .listen((snapshot) {
+      setState(() {
+        newMessageCount = snapshot.docs.length;
+      });
+    });
   }
 
   @override
@@ -41,15 +59,14 @@ class _WelcomePageState extends State<WelcomePage> {
         actions: [
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue, // background color
-              foregroundColor: Colors.white, // text color
-              shadowColor: Colors.black, // shadow color
-              elevation: 5, // elevation
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+              shadowColor: Colors.black,
+              elevation: 5,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10), // rounded corners
+                borderRadius: BorderRadius.circular(10),
               ),
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 10, vertical: 5), // padding
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             ),
             onPressed: () {
               Navigator.push(
@@ -59,7 +76,7 @@ class _WelcomePageState extends State<WelcomePage> {
               );
             },
             child: const Text('Register Restaurant',
-                style: TextStyle(fontSize: 12)), // text style
+                style: TextStyle(fontSize: 12)),
           ),
           GestureDetector(
             onTap: () async {
@@ -149,26 +166,26 @@ class _WelcomePageState extends State<WelcomePage> {
             const SizedBox(height: 20),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green, // background color
-                foregroundColor: Colors.white, // text color
-                shadowColor: Colors.black, // shadow color
-                elevation: 5, // elevation
+                backgroundColor: Colors.green,
+                foregroundColor: Colors.white,
+                shadowColor: Colors.black,
+                elevation: 5,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10), // rounded corners
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 10, vertical: 5), // padding
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               ),
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          const MessagesPage()), // removed the notificationId parameter as it's not required here
+                  MaterialPageRoute(builder: (context) => const MessagesPage()),
                 );
               },
-              child: const Text('View Messages from restaurants',
-                  style: TextStyle(fontSize: 12)), // text style
+              child: Text(
+                'View Messages from restaurants ($newMessageCount new)',
+                style: const TextStyle(fontSize: 12),
+              ),
             ),
           ],
         ),

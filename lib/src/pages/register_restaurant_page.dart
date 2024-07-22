@@ -321,7 +321,7 @@ class _RestaurantHomePageState extends State<RestaurantHomePage> {
                     ),
                     child: const Text(
                       'Make Calculations',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
+                      style: TextStyle(color: Colors.blue, fontSize: 16),
                     ),
                   ),
                 ],

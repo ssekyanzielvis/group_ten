@@ -236,3 +236,80 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.dispose();
   }
 }
+
+class ProfileImageUpdater extends StatefulWidget {
+  const ProfileImageUpdater({super.key, required this.userProfile});
+  final User userProfile;
+
+  @override
+  // ignore: library_private_types_in_public_api
+  _ProfileImageUpdaterState createState() => _ProfileImageUpdaterState();
+}
+
+class _ProfileImageUpdaterState extends State<ProfileImageUpdater> {
+  File? _image;
+  String? _downloadURL;
+  final picker = ImagePicker();
+  final FirebaseStorage storage = FirebaseStorage.instance;
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  Future<void> _pickImage() async {
+    // ignore: deprecated_member_use
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+      } else {
+        print('No image selected.');
+      }
+    });
+
+    if (_image != null) {
+      await _uploadImage();
+    }
+  }
+
+  Future<void> _uploadImage() async {
+    String userId = "user_id"; // Replace with the actual user ID
+    Reference storageReference =
+        storage.ref().child('profile_images/$userId.jpg');
+    UploadTask uploadTask = storageReference.putFile(_image!);
+
+    await uploadTask.whenComplete(() => null);
+
+    storageReference.getDownloadURL().then((fileURL) {
+      setState(() {
+        _downloadURL = fileURL;
+      });
+
+      _updateFirestore(fileURL);
+    });
+  }
+
+  Future<void> _updateFirestore(String fileURL) async {
+    String userId = "user_id"; // Replace with the actual user ID
+    await firestore.collection('users').doc(userId).update({
+      'photoUrl': fileURL,
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: <Widget>[
+        CircleAvatar(
+          radius: 50,
+          backgroundImage: _downloadURL != null
+              ? NetworkImage(_downloadURL!)
+              : const AssetImage('lib/assets/default.jpg') as ImageProvider,
+          backgroundColor: Colors.grey.shade300,
+        ),
+        ElevatedButton(
+          onPressed: _pickImage,
+          child: const Text('Update Profile Image'),
+        ),
+      ],
+    );
+  }
+}

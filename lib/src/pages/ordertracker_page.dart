@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.orange,
       ),
-      //home:  OrderTrackPage(),
+      //  home: const OrderTrackPage(),
     );
   }
 }
@@ -29,7 +29,7 @@ class OrderTrackPage extends StatelessWidget {
 
   final int currentStage = 2;
 
-   OrderTrackPage({super.key}); // Example: Order is currently "Out for Delivery"
+  //const OrderTrackPage({super.key}); // Example: Order is currently "Out for Delivery"
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +66,8 @@ class OrderStageTile extends StatelessWidget {
   final String stageName;
   final bool isActive;
 
-  const OrderStageTile({super.key, required this.stageName, required this.isActive});
+  const OrderStageTile(
+      {super.key, required this.stageName, required this.isActive});
 
   @override
   Widget build(BuildContext context) {
