@@ -78,11 +78,7 @@ class OrderStageTile extends StatelessWidget {
         isActive ? Icons.check_circle : Icons.radio_button_unchecked,
         color: isActive ? Colors.orange : Colors.grey,
       ),
-      title: Text(
-        stageName,
-        style: TextStyle(
-          color: isActive ? Colors.orange : Colors.grey,
-          fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+     
         ),
       ),
     );
