@@ -23,7 +23,7 @@ class OrderTrackPage extends StatelessWidget {
   final List<String> orderStages = [
     "Order Placed",
     "Preparing",
-    "Out for Delivery",
+    "On its way",
     "Delivered"
   ];
 
