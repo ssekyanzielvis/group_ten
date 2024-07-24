@@ -1,3 +1,6 @@
+// ignore_for_file: library_private_types_in_public_api
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -111,9 +114,13 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
         },
         body: jsonEncode(params));
     if (response.statusCode == 200) {
-      print('Profile updated successfully');
+      if (kDebugMode) {
+        print('Profile updated successfully');
+      }
     } else {
-      print('Error updating profile');
+      if (kDebugMode) {
+        print('Error updating profile');
+      }
     }
   }
 
@@ -127,7 +134,9 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
             (jsonData as List).map((e) => Menuitem.fromJson(e)).toList();
       });
     } else {
-      print('Error fetching menu items');
+      if (kDebugMode) {
+        print('Error fetching menu items');
+      }
     }
   }
 
@@ -143,9 +152,13 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
         },
         body: jsonEncode(params));
     if (response.statusCode == 201) {
-      print('Menu item added successfully');
+      if (kDebugMode) {
+        print('Menu item added successfully');
+      }
     } else {
-      print('Error adding menu item');
+      if (kDebugMode) {
+        print('Error adding menu item');
+      }
     }
   }
 
@@ -153,9 +166,13 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
     final url = 'your_delete_menu_item_api_endpoint/$id';
     final response = await http.delete(Uri.parse(url));
     if (response.statusCode == 200) {
-      print('Menu item deleted successfully');
+      if (kDebugMode) {
+        print('Menu item deleted successfully');
+      }
     } else {
-      print('Error deleting menu item');
+      if (kDebugMode) {
+        print('Error deleting menu item');
+      }
     }
   }
 }

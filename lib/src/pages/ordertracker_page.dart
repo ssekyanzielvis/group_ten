@@ -29,6 +29,8 @@ class OrderTrackPage extends StatelessWidget {
 
   final int currentStage = 2;
 
+  OrderTrackPage({super.key});
+
   //const OrderTrackPage({super.key}); // Example: Order is currently "Out for Delivery"
 
   @override

@@ -3,7 +3,7 @@
         {
             "name": "Win32",
             "includePath": [
-                "c:/Users/abdulssekyanzi/Desktop/foodApp/group_ten/**"
+                "C:/Users/abdulssekyanzi/Desktop/group_ten/group_ten"
             ],
             "defines": [
                 "_DEBUG",
@@ -15,11 +15,11 @@
             "cStandard": "c17",
             "cppStandard": "c++17",
             "intelliSenseMode": "windows-msvc-x64",
-            "compilerPathInCppPropertiesJson": "cl.exe",
+
             "mergeConfigurations": true,
             "browse": {
                 "path": [
-                    "c:/Users/abdulssekyanzi/Desktop/foodApp/group_ten/**",
+                    "C:/Users/abdulssekyanzi/Desktop/group_ten/group_ten",
                     "${workspaceFolder}"
                 ],
                 "limitSymbolsToIncludedHeaders": true
