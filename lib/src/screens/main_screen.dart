@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:food_dash/src/pages/food_provider.dart';
 import 'package:food_dash/src/pages/welcome_page_ui.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import '../pages/order_page.dart';
 import '../pages/favourite_page.dart';
 import '../pages/profile_page.dart';
 import '../widgets/auth_service.dart';
@@ -26,7 +27,10 @@ class _MainScreenState extends State<MainScreen> {
   late Widget currentPage;
 
   late WelcomePage homePage;
-  late OrderPage orderPage;
+  // ignore: non_constant_identifier_names
+  late BlogScreen
+      // ignore: non_constant_identifier_names
+      FoodDetailScreen; // Change variable name from orderPage to blogPage
   late FavoritesPage favouritePage;
   late ProfilePage profilePage;
 
@@ -36,19 +40,26 @@ class _MainScreenState extends State<MainScreen> {
 
     // Initialize pages
     homePage = const WelcomePage();
-    orderPage = const OrderPage();
+    FoodDetailScreen = const BlogScreen(); // Initialize BlogScreen
     favouritePage = const FavoritesPage();
     profilePage = const ProfilePage();
-    pages = [homePage, orderPage, favouritePage, profilePage];
+    pages = [homePage, FoodDetailScreen, favouritePage, profilePage];
     currentPage = pages[0];
 
     // Initialize Firebase Messaging
     _firebaseMessaging.requestPermission();
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print('Received a message while in the foreground!');
-      print('Message data: ${message.data}');
+      if (kDebugMode) {
+        print('Received a message while in the foreground!');
+      }
+      if (kDebugMode) {
+        print('Message data: ${message.data}');
+      }
       if (message.notification != null) {
-        print('Message also contained a notification: ${message.notification}');
+        if (kDebugMode) {
+          print(
+              'Message also contained a notification: ${message.notification}');
+        }
         _showNotification(
             message.notification!.title!, message.notification!.body!);
       }
@@ -61,7 +72,7 @@ class _MainScreenState extends State<MainScreen> {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    final InitializationSettings initializationSettings =
+    const InitializationSettings initializationSettings =
         InitializationSettings(
       android: initializationSettingsAndroid,
     );
@@ -127,12 +138,12 @@ class _MainScreenState extends State<MainScreen> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
-            label: 'Cart',
+            icon: Icon(Icons.book),
+            label: 'Blog',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Favorites',
+            icon: Icon(Icons.help),
+            label: 'Help',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),

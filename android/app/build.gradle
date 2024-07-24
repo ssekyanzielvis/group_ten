@@ -1,9 +1,9 @@
-/*plugins {
+plugins {
     id "com.android.application"
-    id "kotlin-android"
+    //id "kotlin-android"
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id "dev.flutter.flutter-gradle-plugin"
-    id 'com.google.gms.google-services'
+    
     
 }
 
@@ -33,7 +33,6 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    
     namespace = "com.example.food_dash"
     compileSdk = 35
     ndkVersion = flutter.ndkVersion
@@ -44,36 +43,49 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.example.food_dash"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdk = 21
         targetSdk = 35
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
-      
+        multiDexEnabled = true
     }
 
-    +       
-        buildTypes {
+    buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now,
-            // so `flutter run --release` works.
-           
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
         }
     }
+}
 
-    }
+dependencies {
+    // Import the Firebase BoM
+    implementation platform("com.google.firebase:firebase-bom:33.1.1")
+
+    // Add the dependencies for Firebase products you want to use
+    // When using the BoM, don't specify versions in Firebase dependencies
+    implementation "com.google.firebase:firebase-analytics"
+    implementation 'com.google.firebase:firebase-core'
+    implementation 'com.google.firebase:firebase-database'
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.android.material:material'
+    implementation 'androidx.constraintlayout:constraintlayout'
+
+    // Google Services
+    implementation 'com.google.gms:google-services'
+    implementation 'com.github.User:Repo:Tag'
+}
+
 
 
 flutter {
     source = "../.."
 }
 
-apply plugin: 'com.google.gms.google-services'*/
-plugins {
+apply plugin: 'com.google.gms.google-services'
+/*plugins {
     id "com.android.application"
     id "kotlin-android"
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
@@ -163,3 +175,4 @@ dependencies {
 flutter {
     source = "../.."
 }
+*/
