@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -87,7 +88,9 @@ class _WelcomePageState extends State<WelcomePage> {
                   MaterialPageRoute(builder: (context) => const LoginScreen()),
                 );
               } catch (e) {
-                print('Error signing out: $e');
+                if (kDebugMode) {
+                  print('Error signing out: $e');
+                }
               }
             },
             child: const Padding(

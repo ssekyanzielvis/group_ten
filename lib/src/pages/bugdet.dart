@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -263,34 +264,207 @@ class FoodListScreen extends StatelessWidget {
   }
 }
 
-class PaymentService {
-  Future<void> processMobilePayment(double amount) async {
-    // Mock URL for the mobile money payment API
-    const String apiUrl = 'https://mobile-money-api.example.com/pay';
+class AirtelPaymentService {
+  final String authUrl = 'https://openapi.airtel.africa/auth/oauth2/token';
+  final String apiUrl =
+      'https://openapiuat.airtel.africa/standard/v2/cashin/'; // Cash in URL
+  final String cashOutUrl =
+      'https://openapiuat.airtel.africa/standard/v2/cashout/'; // Cash out URL
+  final String apiKey = 'your_api_key'; // Replace with your actual API key
+  final String apiSecret =
+      'your_api_secret'; // Replace with your actual API secret
+  // Replace with your actual API secret
 
-    // Simulated request body
+  Future<String> getAccessToken() async {
+    final response = await http.post(
+      Uri.parse(authUrl),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization':
+            'Basic ${base64Encode(utf8.encode('$apiKey:$apiSecret'))}',
+      },
+      body: jsonEncode({'grant_type': 'client_credentials'}),
+    );
+
+    if (response.statusCode == 200) {
+      final responseBody = jsonDecode(response.body);
+      return responseBody['access_token'];
+    } else {
+      throw Exception('Failed to get access token');
+    }
+  }
+
+  Future<void> cashIn(double amount, String phoneNumber) async {
+    final String accessToken = await getAccessToken();
+
     final Map<String, dynamic> requestBody = {
-      'amount': amount.toString(),
-      'currency': 'UGx', // or whatever currency you're working with
-      'paymentMethod': 'mobile_money', // specific to the API
+      'reference': 'your_reference',
+      'subscriber': {
+        'country': 'UG', // or your country code
+        'currency': 'UGX', // or your currency code
+        'msisdn': phoneNumber,
+      },
+      'transaction': {
+        'amount': amount.toString(),
+        'country': 'UG',
+        'currency': 'UGX',
+        'id': 'your_transaction_id',
+      }
     };
 
-    // Making the HTTP POST request
     final response = await http.post(
       Uri.parse(apiUrl),
       headers: {
         'Content-Type': 'application/json',
-        // Add any required headers here, like authorization tokens
+        'Authorization': 'Bearer $accessToken',
       },
       body: jsonEncode(requestBody),
     );
 
-    // Handling the response
-    if (response.statusCode == 200) {
-      print('Payment successful');
+    if (response.statusCode == 201) {
+      print('Cash In successful');
     } else {
-      print('Payment failed: ${response.reasonPhrase}');
+      print('Cash In failed: ${response.reasonPhrase}');
     }
+  }
+
+  Future<void> cashOut(double amount, String phoneNumber) async {
+    final String accessToken = await getAccessToken();
+
+    final Map<String, dynamic> requestBody = {
+      'reference': 'your_reference',
+      'subscriber': {
+        'country': 'UG', // or your country code
+        'currency': 'UGX', // or your currency code
+        'msisdn': phoneNumber,
+      },
+      'transaction': {
+        'amount': amount.toString(),
+        'country': 'UG',
+        'currency': 'UGX',
+        'id': 'your_transaction_id',
+      }
+    };
+
+    final response = await http.post(
+      Uri.parse(cashOutUrl),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+      body: jsonEncode(requestBody),
+    );
+
+    if (response.statusCode == 201) {
+      print('Cash Out successful');
+    } else {
+      print('Cash Out failed: ${response.reasonPhrase}');
+    }
+  }
+}
+
+class PaymentPage extends StatelessWidget {
+  final Food food;
+  PaymentPage({super.key, required this.food});
+
+  final AirtelPaymentService _paymentService = AirtelPaymentService();
+
+  void _processCashInPayment(
+      BuildContext context, double amount, String phoneNumber) async {
+    await _paymentService.cashIn(amount, phoneNumber);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Cash In payment processed')),
+    );
+  }
+
+  void _processCashOutPayment(
+      BuildContext context, double amount, String phoneNumber) async {
+    await _paymentService.cashOut(amount, phoneNumber);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Cash Out payment processed')),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Payment for ${food.name}',
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: Colors.deepOrange,
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Text(
+              'Choose payment method for ${food.name}',
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () => _processCashInPayment(context, food.price,
+                  'user_phone_number'), // replace 'user_phone_number'
+              style: ElevatedButton.styleFrom(
+                iconColor: Colors.green,
+                disabledIconColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+              ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.money),
+                  SizedBox(width: 10),
+                  Text('Pay by Cash In'),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () => _processCashOutPayment(context, food.price,
+                  'user_phone_number'), // replace 'user_phone_number'
+              style: ElevatedButton.styleFrom(
+                disabledIconColor: Colors.blue,
+                iconColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+              ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.phone_android),
+                  SizedBox(width: 10),
+                  Text('Pay by Cash Out'),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -313,13 +487,20 @@ class Food {
   final double price;
   final String restaurantName;
 
-  Food({required this.name, required this.price, required this.restaurantName});
+  String restaurantPhoneNumber;
+
+  Food(
+      {required this.name,
+      required this.price,
+      required this.restaurantName,
+      required this.restaurantPhoneNumber});
 
   factory Food.fromFirestore(Map<String, dynamic> data) {
     return Food(
       name: data['name'],
       price: data['price'],
       restaurantName: data['restaurantName'],
+      restaurantPhoneNumber: '',
     );
   }
 }
@@ -328,7 +509,7 @@ class PaymentScreen extends StatelessWidget {
   final Food food;
   PaymentScreen({super.key, required this.food});
 
-  final PaymentService _paymentService = PaymentService();
+  final AirtelPaymentService _paymentService = AirtelPaymentService();
 
   void _processCashPayment(BuildContext context, Food food) {
     Navigator.push(
@@ -342,14 +523,18 @@ class PaymentScreen extends StatelessWidget {
     );
   }
 
-  void _processMobilePayment(BuildContext context) async {
-    await _paymentService.processMobilePayment(food.price);
-    // ignore: use_build_context_synchronously
+  void _processMobilePayment(BuildContext context, bool isCashIn) async {
+    if (isCashIn) {
+      await _paymentService.cashIn(food.price, food.restaurantPhoneNumber);
+    } else {
+      await _paymentService.cashOut(food.price, food.restaurantPhoneNumber);
+    }
+
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Mobile payment processed')),
+      SnackBar(content: Text('${isCashIn ? 'Cash In' : 'Cash Out'} processed')),
     );
+
     Navigator.push(
-      // ignore: use_build_context_synchronously
       context,
       MaterialPageRoute(
         builder: (context) => PaymentConfirmationScreen(food: food),
@@ -410,7 +595,7 @@ class PaymentScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () => _processMobilePayment(context),
+              onPressed: () => _processMobilePayment(context, true),
               style: ElevatedButton.styleFrom(
                 disabledIconColor: Colors.blue,
                 iconColor: Colors.white,
@@ -427,7 +612,30 @@ class PaymentScreen extends StatelessWidget {
                 children: [
                   Icon(Icons.phone_android),
                   SizedBox(width: 10),
-                  Text('Pay with Mobile Money'),
+                  Text('Cash In with Mobile Money'),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () => _processMobilePayment(context, false),
+              style: ElevatedButton.styleFrom(
+                disabledIconColor: Colors.blue,
+                iconColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+              ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.phone_android),
+                  SizedBox(width: 10),
+                  Text('Cash Out with Mobile Money'),
                 ],
               ),
             ),
@@ -837,11 +1045,13 @@ class MessageScreen extends StatelessWidget {
         'timestamp': DateTime.now(),
       });
 
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Message sent')),
       );
 
       // Navigate back to the previous screen
+      // ignore: use_build_context_synchronously
       Navigator.pop(context);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1026,6 +1236,7 @@ class MessagesPage extends StatelessWidget {
                         .update({'isRead': true});
 
                     Navigator.push(
+                      // ignore: use_build_context_synchronously
                       context,
                       MaterialPageRoute(
                         builder: (context) =>

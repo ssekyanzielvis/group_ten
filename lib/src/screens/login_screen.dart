@@ -1,12 +1,20 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:food_dash/src/screens/signup_screen.dart';
 import '../widgets/auth_service.dart';
+// ignore: depend_on_referenced_packages
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import '../screens/main_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _LoginScreenState createState() => _LoginScreenState();
 }
 
@@ -23,6 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       await _authService.signIn(
           _emailController.text, _passwordController.text);
+      // ignore: use_build_context_synchronously
       Navigator.pushReplacementNamed(context, '/home');
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -35,6 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       User? user = await _authService.signInWithGoogle();
       if (user != null) {
+        // ignore: use_build_context_synchronously
         Navigator.pushReplacementNamed(context, '/home');
       } else {
         setState(() {
@@ -83,38 +93,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _facebookButton() {
-    return ElevatedButton.icon(
-      onPressed: () {
-        // Implement Facebook login logic here
-      },
-      icon: const Icon(Icons.fastfood, color: Colors.white),
-      label: const Text('Log In with Facebook'),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF1877F2), // Facebook blue
-        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-        textStyle: const TextStyle(fontSize: 18),
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
-      ),
-    );
-  }
-
-  Widget _googleButton() {
-    return ElevatedButton.icon(
-      onPressed: signInWithGoogle,
-      icon: const Icon(Icons.fastfood, color: Colors.white),
-      label: const Text('Log In with Google'),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFFDB4437), // Google red
-        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-        textStyle: const TextStyle(fontSize: 18),
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -159,9 +137,19 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: TextStyle(color: Color(0xFF1877F2))),
                 ),
                 const Divider(),
-                _facebookButton(),
-                const SizedBox(height: 10.0),
-                _googleButton(),
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const SocialSignIn()),
+                    );
+                  },
+                  child: const Text(
+                    "Sign In With Google or Facebook",
+                    style: TextStyle(color: Color(0xFF1877F2)),
+                  ),
+                ),
               ],
             ),
           ),
@@ -185,6 +173,7 @@ class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _ForgotPasswordScreenState createState() => _ForgotPasswordScreenState();
 }
 
@@ -204,11 +193,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
     try {
       await _authService.resetPassword(email);
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Password reset email sent')),
       );
+      // ignore: use_build_context_synchronously
       Navigator.pop(context);
     } catch (e) {
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
       );
@@ -240,6 +232,263 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               child: const Text('Send Password Reset Email'),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class SocialSignIn extends StatefulWidget {
+  const SocialSignIn({super.key});
+
+  @override
+  // ignore: library_private_types_in_public_api
+  _SocialSignInState createState() => _SocialSignInState();
+}
+
+class _SocialSignInState extends State<SocialSignIn> {
+  Map<String, String> profileDetail = {};
+  TextEditingController firstNameController = TextEditingController();
+  TextEditingController lastNameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
+  TextEditingController dobController = TextEditingController();
+
+  Future<void> getFbUserData() async {
+    await FacebookAuth.instance.login();
+    final LoginResult result = await FacebookAuth.instance.login(
+      permissions: ['email', 'public_profile'],
+    );
+
+    if (result.status == LoginStatus.success) {
+      final userData = await FacebookAuth.instance.getUserData(
+        fields: "id,first_name,last_name,email,picture.width(200)",
+      );
+      setState(() {
+        profileDetail['social_id'] = userData['id'];
+        profileDetail['social_name'] =
+            userData['first_name'] + ' ' + userData['last_name'];
+        profileDetail['social_url'] = userData['picture']['data']['url'];
+        profileDetail['social_email'] = userData['email'];
+        profileDetail['social_type'] = '2';
+      });
+
+      signInCheck(
+        profileDetail['social_id']!,
+        profileDetail['social_email']!,
+        profileDetail['social_phone'],
+        profileDetail['social_type']!,
+      );
+    } else {
+      if (kDebugMode) {
+        print('Facebook login failed: ${result.message}');
+      }
+    }
+  }
+
+  Future<void> onSignInGoogle() async {
+    final GoogleSignIn googleSignIn = GoogleSignIn(
+      scopes: ['email'],
+      clientId: 'YOUR_CLIENT_ID.apps.googleusercontent.com',
+    );
+    try {
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+      if (googleUser != null) {
+        setState(() {
+          profileDetail['social_id'] = googleUser.id;
+          profileDetail['social_name'] = googleUser.displayName ?? '';
+          profileDetail['social_url'] = googleUser.photoUrl ?? '';
+          profileDetail['social_email'] = googleUser.email;
+          profileDetail['social_type'] = '1';
+        });
+
+        signInCheck(
+          profileDetail['social_id']!,
+          profileDetail['social_email']!,
+          profileDetail['social_phone'],
+          profileDetail['social_type']!,
+        );
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Google sign-in failed: $error');
+      }
+    }
+  }
+
+  Future<void> signInCheck(String userSocialId, String userSocialEmail,
+      String? userSocialPhone, String userSocialType) async {
+    if (userSocialId.isNotEmpty &&
+        (userSocialEmail.isNotEmpty ||
+            (userSocialPhone?.isNotEmpty ?? false)) &&
+        userSocialType.isNotEmpty) {
+      final response = await http.post(
+        Uri.parse('/home'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          "_token": "ZhyldROEYcLzAc8tc3RE9rHKxRMvM1p13SQjnHO5",
+          "user_social_id": userSocialId,
+          "user_social_email": userSocialEmail,
+          "user_social_phone": userSocialPhone ?? '',
+          "user_social_type": userSocialType,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final result = json.decode(response.body);
+        if (kDebugMode) {
+          print(result);
+        }
+
+        if (result.containsKey('userRegister')) {
+          if (profileDetail['social_name'] != null) {
+            var name = profileDetail['social_name']!.split(' ');
+            firstNameController.text = name[0];
+            if (name.length > 1) {
+              lastNameController.text = name[1];
+            }
+          }
+          if (profileDetail['social_email'] != null) {
+            emailController.text = profileDetail['social_email']!;
+          }
+          if (profileDetail['social_phone'] != null) {
+            phoneController.text = profileDetail['social_phone']!;
+          }
+          // Open register popup
+          showDialog(
+            // ignore: use_build_context_synchronously
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Register'),
+                content: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      _decoratedTextField(
+                        controller: firstNameController,
+                        labelText: 'First Name',
+                      ),
+                      _decoratedTextField(
+                        controller: lastNameController,
+                        labelText: 'Last Name',
+                      ),
+                      _decoratedTextField(
+                        controller: emailController,
+                        labelText: 'Email',
+                        keyboardType: TextInputType.emailAddress,
+                      ),
+                      _decoratedTextField(
+                        controller: phoneController,
+                        labelText: 'Phone Number',
+                        keyboardType: TextInputType.phone,
+                      ),
+                      _decoratedTextField(
+                        controller: dobController,
+                        labelText: 'Date of Birth',
+                        keyboardType: TextInputType.datetime,
+                      ),
+                    ],
+                  ),
+                ),
+                actions: <Widget>[
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Close'),
+                  ),
+                ],
+              );
+            },
+          );
+        }
+
+        if (result.containsKey('socialLogin')) {
+          // ignore: use_build_context_synchronously
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => const MainScreen(),
+            ),
+          );
+        }
+      } else {
+        if (kDebugMode) {
+          print('Failed to sign in: ${response.statusCode}');
+        }
+      }
+    } else {
+      if (kDebugMode) {
+        print('Provide proper input');
+      }
+    }
+  }
+
+  Widget _decoratedTextField({
+    required TextEditingController controller,
+    required String labelText,
+    TextInputType keyboardType = TextInputType.text,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: labelText,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
+        ),
+        keyboardType: keyboardType,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Social Sign-In'),
+        backgroundColor: const Color(0xFF1877F2), // Custom color for app bar
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: getFbUserData,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF1877F2), // Facebook blue
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                  textStyle: const TextStyle(fontSize: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                ),
+                child: const Text('Sign in with Facebook'),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: onSignInGoogle,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFDB4437), // Google red
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                  textStyle: const TextStyle(fontSize: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                ),
+                child: const Text('Sign in with Google'),
+              ),
+            ],
+          ),
         ),
       ),
     );

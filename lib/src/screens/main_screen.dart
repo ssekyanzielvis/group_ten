@@ -8,6 +8,9 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../pages/favourite_page.dart';
 import '../pages/profile_page.dart';
 import '../widgets/auth_service.dart';
+import '../pages/register_restaurant_page.dart';
+import '../pages/bugdet.dart';
+import '../pages/calculator.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -27,11 +30,8 @@ class _MainScreenState extends State<MainScreen> {
   late Widget currentPage;
 
   late WelcomePage homePage;
-  // ignore: non_constant_identifier_names
-  late BlogScreen
-      // ignore: non_constant_identifier_names
-      FoodDetailScreen; // Change variable name from orderPage to blogPage
-  late FavoritesPage favouritePage;
+  late BlogScreen blogScreen;
+  late FavoritesPage favoritePage;
   late ProfilePage profilePage;
 
   @override
@@ -40,10 +40,10 @@ class _MainScreenState extends State<MainScreen> {
 
     // Initialize pages
     homePage = const WelcomePage();
-    FoodDetailScreen = const BlogScreen(); // Initialize BlogScreen
-    favouritePage = const FavoritesPage();
+    blogScreen = const BlogScreen(); // Initialize BlogScreen
+    favoritePage = const FavoritesPage();
     profilePage = const ProfilePage();
-    pages = [homePage, FoodDetailScreen, favouritePage, profilePage];
+    pages = [homePage, blogScreen, favoritePage, profilePage];
     currentPage = pages[0];
 
     // Initialize Firebase Messaging
@@ -51,8 +51,6 @@ class _MainScreenState extends State<MainScreen> {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       if (kDebugMode) {
         print('Received a message while in the foreground!');
-      }
-      if (kDebugMode) {
         print('Message data: ${message.data}');
       }
       if (message.notification != null) {
@@ -123,33 +121,101 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        onTap: (int index) {
-          setState(() {
-            currentTabIndex = index;
-            currentPage = pages[index];
-          });
-        },
-        currentIndex: currentTabIndex,
-        type: BottomNavigationBarType.fixed,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.book),
-            label: 'Blog',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.help),
-            label: 'Help',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.orange,
+              ),
+              child: Text(
+                'Food Dash',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.home),
+              title: const Text('Home'),
+              onTap: () {
+                setState(() {
+                  currentTabIndex = 0;
+                  currentPage = pages[0];
+                });
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.book),
+              title: const Text('Blog'),
+              onTap: () {
+                setState(() {
+                  currentTabIndex = 1;
+                  currentPage = pages[1];
+                });
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.help),
+              title: const Text('Help'),
+              onTap: () {
+                setState(() {
+                  currentTabIndex = 2;
+                  currentPage = pages[2];
+                });
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text('Profile'),
+              onTap: () {
+                setState(() {
+                  currentTabIndex = 3;
+                  currentPage = pages[3];
+                });
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.message_sharp),
+              title: const Text('Messages'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MessagesPage()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.app_registration_rounded),
+              title: const Text('Register Restaurant'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const RegisterRestaurantPage()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.calculate_rounded),
+              title: const Text('Calculator'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CalculatorScreen(),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
       ),
       body: currentPage,
     );
