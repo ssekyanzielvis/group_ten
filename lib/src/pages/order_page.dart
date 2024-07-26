@@ -28,9 +28,10 @@ class _OrderPageState extends State<OrderPage> {
           OrderCard(
             foodItem: 'chips',
             description: 'Taste the feeling.',
-            price: 10.0,
+            price: 3000,
             imageUrl: 'lib/assets/images/chips chicken salads.jfif',
-            status: 'Delivered',
+             status: 'Delivered',
+           
           ),
         ],
       ),
