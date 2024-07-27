@@ -5,12 +5,12 @@ import 'package:food_dash/src/pages/food_provider.dart';
 import 'package:food_dash/src/pages/welcome_page_ui.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import '../pages/favourite_page.dart';
 import '../pages/profile_page.dart';
 import '../widgets/auth_service.dart';
 import '../pages/register_restaurant_page.dart';
 import '../pages/bugdet.dart';
 import '../pages/calculator.dart';
+import '../pages/help.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -31,7 +31,7 @@ class _MainScreenState extends State<MainScreen> {
 
   late WelcomePage homePage;
   late BlogScreen blogScreen;
-  late FavoritesPage favoritePage;
+  late HelpPage helpPage;
   late ProfilePage profilePage;
 
   @override
@@ -41,9 +41,9 @@ class _MainScreenState extends State<MainScreen> {
     // Initialize pages
     homePage = const WelcomePage();
     blogScreen = const BlogScreen(); // Initialize BlogScreen
-    favoritePage = const FavoritesPage();
+    helpPage = const HelpPage();
     profilePage = const ProfilePage();
-    pages = [homePage, blogScreen, favoritePage, profilePage];
+    pages = [homePage, blogScreen, helpPage, profilePage];
     currentPage = pages[0];
 
     // Initialize Firebase Messaging
@@ -127,7 +127,7 @@ class _MainScreenState extends State<MainScreen> {
           children: <Widget>[
             const DrawerHeader(
               decoration: BoxDecoration(
-                color: Colors.orange,
+                color: Colors.deepOrange,
               ),
               child: Text(
                 'Food Dash',

@@ -24,7 +24,7 @@ class BlogScreen extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.deepOrange,
       ),
       body: FutureBuilder<List<Food>>(
         future: fetchFoods(),
@@ -106,7 +106,7 @@ class BlogScreen extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.deepOrange,
         child: const Icon(Icons.add),
         onPressed: () {
           Navigator.of(context).push(
@@ -169,7 +169,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.deepOrange,
         actions: [
           IconButton(
             icon: const Icon(Icons.add_box_rounded),
@@ -318,7 +318,7 @@ class FoodDetailScreen extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              backgroundColor: Colors.green,
+              backgroundColor: Colors.deepOrange,
             ),
             body: SingleChildScrollView(
               child: Column(

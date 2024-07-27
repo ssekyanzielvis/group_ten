@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:math_expressions/math_expressions.dart' as math_expressions;
@@ -6,6 +7,7 @@ class CalculatorScreen extends StatefulWidget {
   const CalculatorScreen({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _CalculatorScreenState createState() => _CalculatorScreenState();
 }
 
@@ -40,7 +42,9 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
           _result = exp.evaluate(math_expressions.EvaluationType.REAL,
               math_expressions.ContextModel());
         } catch (e) {
-          print('Error evaluating expression: $e');
+          if (kDebugMode) {
+            print('Error evaluating expression: $e');
+          }
           _result = 0.0;
         }
       }
@@ -65,7 +69,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Calculator'),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Colors.deepOrange,
         actions: [
           IconButton(
             icon: const Icon(Icons.history),
@@ -107,7 +111,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                     Text(
                       '$_result',
                       style: const TextStyle(
-                          fontSize: 24, color: Colors.deepPurple),
+                          fontSize: 24, color: Colors.deepOrange),
                     ),
                   ],
                 ),
@@ -143,7 +147,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _clear,
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Colors.deepOrange,
         child: const Icon(Icons.clear),
       ),
     );
@@ -181,7 +185,7 @@ class HistoryScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Calculation History'),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Colors.deepOrange,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
