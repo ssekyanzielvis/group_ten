@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
@@ -10,6 +11,7 @@ class RegisterRestaurantPage extends StatefulWidget {
   const RegisterRestaurantPage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _RegisterRestaurantPageState createState() => _RegisterRestaurantPageState();
 }
 
@@ -30,6 +32,7 @@ class _RegisterRestaurantPageState extends State<RegisterRestaurantPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_isLogin ? 'Login Restaurant' : 'Register Restaurant'),
+        backgroundColor: Colors.deepOrange, // Replace with your desired color
       ),
       body: Container(
         decoration: const BoxDecoration(
@@ -138,6 +141,7 @@ class _RegisterRestaurantPageState extends State<RegisterRestaurantPage> {
       });
 
       Navigator.pushReplacement(
+        // ignore: use_build_context_synchronously
         context,
         MaterialPageRoute(
           builder: (context) => RestaurantHomePage(
@@ -146,6 +150,7 @@ class _RegisterRestaurantPageState extends State<RegisterRestaurantPage> {
         ),
       );
     } catch (e) {
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Registration failed: $e')),
       );
@@ -162,6 +167,7 @@ class _RegisterRestaurantPageState extends State<RegisterRestaurantPage> {
 
       if (snapshot.docs.isNotEmpty) {
         Navigator.pushReplacement(
+          // ignore: use_build_context_synchronously
           context,
           MaterialPageRoute(
             builder: (context) => RestaurantHomePage(
@@ -170,11 +176,13 @@ class _RegisterRestaurantPageState extends State<RegisterRestaurantPage> {
           ),
         );
       } else {
+        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Invalid restaurant name or password')),
         );
       }
     } catch (e) {
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Login failed: $e')),
       );
@@ -188,6 +196,7 @@ class RestaurantHomePage extends StatefulWidget {
   const RestaurantHomePage({super.key, required this.restaurantId});
 
   @override
+  // ignore: library_private_types_in_public_api
   _RestaurantHomePageState createState() => _RestaurantHomePageState();
 }
 
@@ -423,7 +432,9 @@ class RestaurantRepository extends GetxController {
         backgroundColor: Colors.red.withOpacity(0.1),
         colorText: Colors.blue,
       );
-      print(error.toString());
+      if (kDebugMode) {
+        print(error.toString());
+      }
     }
   }
 }

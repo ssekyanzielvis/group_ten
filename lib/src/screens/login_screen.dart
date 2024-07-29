@@ -83,7 +83,8 @@ class _LoginScreenState extends State<LoginScreen> {
     return ElevatedButton(
       onPressed: signInWithEmailAndPassword,
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF1877F2), // Facebook blue
+        backgroundColor:
+            const Color.fromARGB(255, 242, 75, 24), // Facebook blue
         padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
         textStyle: const TextStyle(fontSize: 18),
         shape:
@@ -98,7 +99,8 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Login'),
-        backgroundColor: const Color(0xFF1877F2), // Facebook blue
+        backgroundColor:
+            const Color.fromARGB(255, 242, 89, 24), // Facebook blue
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -123,7 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     );
                   },
                   child: const Text("You're new? Sign Up",
-                      style: TextStyle(color: Color(0xFF1877F2))),
+                      style: TextStyle(color: Colors.deepOrange)),
                 ),
                 TextButton(
                   onPressed: () {
@@ -134,7 +136,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     );
                   },
                   child: const Text("Forgot password? Recover your account",
-                      style: TextStyle(color: Color(0xFF1877F2))),
+                      style: TextStyle(color: Colors.deepOrange)),
                 ),
                 const Divider(),
                 TextButton(
@@ -147,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                   child: const Text(
                     "Sign In With Google or Facebook",
-                    style: TextStyle(color: Color(0xFF1877F2)),
+                    style: TextStyle(color: Colors.deepOrange),
                   ),
                 ),
               ],
@@ -452,7 +454,8 @@ class _SocialSignInState extends State<SocialSignIn> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Social Sign-In'),
-        backgroundColor: const Color(0xFF1877F2), // Custom color for app bar
+        backgroundColor:
+            const Color.fromARGB(255, 242, 75, 24), // Custom color for app bar
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -463,7 +466,8 @@ class _SocialSignInState extends State<SocialSignIn> {
               ElevatedButton(
                 onPressed: getFbUserData,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1877F2), // Facebook blue
+                  backgroundColor:
+                      const Color.fromARGB(255, 242, 71, 24), // Facebook blue
                   padding:
                       const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                   textStyle: const TextStyle(fontSize: 16),

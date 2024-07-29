@@ -17,24 +17,24 @@ class MessageInputScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController _controller = TextEditingController();
+    final TextEditingController controller = TextEditingController();
 
-    Future<void> _sendMessage() async {
+    Future<void> sendMessage() async {
       final user = FirebaseAuth.instance.currentUser;
-      if (user != null && _controller.text.isNotEmpty) {
+      if (user != null && controller.text.isNotEmpty) {
         await FirebaseFirestore.instance.collection('messages').add({
           'email': user.email,
-          'content': _controller.text,
+          'content': controller.text,
           'timestamp': Timestamp.now(),
         });
-        _controller.clear();
+        controller.clear();
       }
     }
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Send a Message'),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Colors.deepOrange,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -59,11 +59,11 @@ class MessageInputScreen extends StatelessWidget {
                 child: Row(
                   children: [
                     const Icon(Icons.message,
-                        color: Colors.deepPurple, size: 30),
+                        color: Colors.deepOrange, size: 30),
                     const SizedBox(width: 10),
                     Expanded(
                       child: TextField(
-                        controller: _controller,
+                        controller: controller,
                         decoration: const InputDecoration(
                           labelText: 'Type your message',
                           border: InputBorder.none,
@@ -79,13 +79,13 @@ class MessageInputScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                   gradient: const LinearGradient(
-                    colors: [Colors.deepPurple, Colors.deepOrange],
+                    colors: [Colors.deepOrange, Colors.deepOrange],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.deepPurple.withOpacity(0.5),
+                      color: Colors.deepOrange.withOpacity(0.5),
                       spreadRadius: 3,
                       blurRadius: 5,
                       offset: const Offset(0, 3),
@@ -93,7 +93,7 @@ class MessageInputScreen extends StatelessWidget {
                   ],
                 ),
                 child: ElevatedButton.icon(
-                  onPressed: _sendMessage,
+                  onPressed: sendMessage,
                   icon: const Icon(Icons.send, color: Colors.white),
                   label:
                       const Text('Send', style: TextStyle(color: Colors.white)),
@@ -123,7 +123,7 @@ class MessageListScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Messages'),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Colors.deepOrange,
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
@@ -187,13 +187,13 @@ class MessageListScreen extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.email, color: Colors.deepPurple),
+                            const Icon(Icons.email, color: Colors.deepOrange),
                             const SizedBox(width: 10),
                             Text(
                               message.email,
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
-                                color: Colors.deepPurple,
+                                color: Colors.deepOrange,
                               ),
                             ),
                           ],
@@ -208,7 +208,7 @@ class MessageListScreen extends StatelessWidget {
                         Row(
                           children: [
                             const Icon(Icons.access_time,
-                                color: Colors.deepPurple),
+                                color: Colors.deepOrange),
                             const SizedBox(width: 10),
                             Text(
                               message.timestamp.toString(),
@@ -222,7 +222,7 @@ class MessageListScreen extends StatelessWidget {
                           child: Text(
                             'Tap To Reply Your Customer',
                             style: TextStyle(
-                              color: Colors.deepPurple,
+                              color: Colors.deepOrange,
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
                             ),

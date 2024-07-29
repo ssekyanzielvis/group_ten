@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously, duplicate_ignore
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -6,6 +8,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:convert';
 import '../pages/messages_reply.dart';
 import 'calculator.dart';
+// ignore: depend_on_referenced_packages
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class BudgetScreen extends StatelessWidget {
   final TextEditingController _budgetController = TextEditingController();
@@ -44,24 +48,23 @@ class BudgetScreen extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    const Icon(
-                      Icons.monetization_on,
-                      color: Colors.deepOrange,
+                    const FaIcon(
+                      FontAwesomeIcons.coins, // New money icon
                       size: 50,
+                      color: Colors.deepOrange,
                     ),
                     const SizedBox(height: 20),
                     TextField(
                       controller: _budgetController,
                       decoration: InputDecoration(
-                        labelText: 'Budget Amount',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: const BorderSide(
-                            color: Colors.deepOrange,
+                          labelText: 'Budget Amount',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(
+                              color: Colors.deepOrange,
+                            ),
                           ),
-                        ),
-                        prefixIcon: const Icon(Icons.attach_money),
-                      ),
+                          prefixIcon: const Icon(Icons.payments)),
                       keyboardType: TextInputType.number,
                     ),
                     const SizedBox(height: 20),
@@ -322,9 +325,13 @@ class AirtelPaymentService {
     );
 
     if (response.statusCode == 201) {
-      print('Cash In successful');
+      if (kDebugMode) {
+        print('Cash In successful');
+      }
     } else {
-      print('Cash In failed: ${response.reasonPhrase}');
+      if (kDebugMode) {
+        print('Cash In failed: ${response.reasonPhrase}');
+      }
     }
   }
 
@@ -356,9 +363,13 @@ class AirtelPaymentService {
     );
 
     if (response.statusCode == 201) {
-      print('Cash Out successful');
+      if (kDebugMode) {
+        print('Cash Out successful');
+      }
     } else {
-      print('Cash Out failed: ${response.reasonPhrase}');
+      if (kDebugMode) {
+        print('Cash Out failed: ${response.reasonPhrase}');
+      }
     }
   }
 }
@@ -662,7 +673,7 @@ class PaymentConfirmationScreen extends StatelessWidget {
           ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.deepOrange,
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -675,7 +686,7 @@ class PaymentConfirmationScreen extends StatelessWidget {
                   color: Colors.green[50],
                   borderRadius: BorderRadius.circular(15),
                   border: Border.all(
-                    color: Colors.green,
+                    color: Colors.deepOrange,
                     width: 2,
                   ),
                 ),
@@ -704,7 +715,7 @@ class PaymentConfirmationScreen extends StatelessWidget {
                       icon: const Icon(Icons.home),
                       label: const Text('Back to Home'),
                       style: ElevatedButton.styleFrom(
-                        iconColor: Colors.green,
+                        iconColor: Colors.deepOrange,
                         disabledIconColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),

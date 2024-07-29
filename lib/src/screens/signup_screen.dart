@@ -6,6 +6,7 @@ class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _SignUpScreenState createState() => _SignUpScreenState();
 }
 
@@ -27,6 +28,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         _phoneNumberController.text,
         _dobController.text,
       );
+      // ignore: use_build_context_synchronously
       Navigator.pushReplacementNamed(context, '/home');
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -60,7 +62,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return ElevatedButton(
       onPressed: signUp,
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF1877F2), // Facebook blue
+        backgroundColor:
+            const Color.fromARGB(255, 242, 78, 24), // Facebook blue
         padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
         textStyle: const TextStyle(fontSize: 18),
         shape:
@@ -75,7 +78,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Sign Up'),
-        backgroundColor: const Color(0xFF1877F2), // Facebook blue
+        backgroundColor:
+            const Color.fromARGB(255, 242, 71, 24), // Facebook blue
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -102,7 +106,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     Navigator.pushReplacementNamed(context, '/login');
                   },
                   child: const Text("Already have an account? Login",
-                      style: TextStyle(color: Color(0xFF1877F2))),
+                      style:
+                          TextStyle(color: Color.fromARGB(255, 242, 71, 24))),
                 ),
               ],
             ),

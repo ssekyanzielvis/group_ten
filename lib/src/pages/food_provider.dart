@@ -87,7 +87,7 @@ class BlogScreen extends StatelessWidget {
                       ],
                     ),
                     trailing: Text(
-                      'UGX${food.pricePerKg}/kg',
+                      'UGX${food.pricePerKg}@',
                       style: const TextStyle(
                         fontSize: 16,
                         color: Colors.green,
@@ -224,7 +224,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
               const SizedBox(height: 10),
               TextFormField(
                 decoration: InputDecoration(
-                  labelText: 'Price per Kg',
+                  labelText: 'Price @',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0),
                   ),
@@ -356,7 +356,7 @@ class FoodDetailScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          'Price per Kg: UGX${food.pricePerKg.toStringAsFixed(2)}',
+                          'Price @: UGX${food.pricePerKg.toStringAsFixed(2)}',
                           style: const TextStyle(
                             fontSize: 18,
                             color: Colors.black54,
