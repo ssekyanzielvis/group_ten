@@ -13,25 +13,24 @@ class _OrderPageState extends State<OrderPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Your Food Cart',
           style: TextStyle(color: Colors.black),
         ),
         centerTitle: true,
-        backgroundColor: Color.fromARGB(255, 92, 62, 201),
+        backgroundColor: const Color.fromARGB(255, 92, 62, 201),
         elevation: 0.0,
       ),
       body: ListView(
-        padding: EdgeInsets.symmetric(horizontal: 10.0),
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
         scrollDirection: Axis.vertical,
-        children: <Widget>[
+        children: const <Widget>[
           OrderCard(
             foodItem: 'chips',
             description: 'Taste the feeling.',
-            price: 3000,
+            price: 10.0,
             imageUrl: 'lib/assets/images/chips chicken salads.jfif',
-             status: 'Delivered',
-           
+            status: 'Delivered',
           ),
         ],
       ),

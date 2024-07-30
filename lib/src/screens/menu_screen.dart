@@ -7,6 +7,7 @@ class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _MenuScreenState createState() => _MenuScreenState();
 }
 class _MenuScreenState extends State<MenuScreen> {
@@ -63,7 +64,6 @@ class _MenuScreenState extends State<MenuScreen> {
                   _nameController.clear();
                   _priceController.clear();
                   setState(() {
-                    late File imageFile = File('');
                   });
                 }
               },

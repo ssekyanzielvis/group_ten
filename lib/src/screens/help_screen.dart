@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -14,9 +16,9 @@ class MyApp extends StatelessWidget {
       ),
       home: HelpSupportPage(),
       routes: {
-        '/feedback': (context) => FeedbackPage(),
-        '/contact/email': (context) => ContactEmailPage(),
-        '/contact/phone': (context) => ContactPhonePage(),
+        '/feedback': (context) => const FeedbackPage(),
+        '/contact/email': (context) => const ContactEmailPage(),
+        '/contact/phone': (context) => const ContactPhonePage(),
       },
     );
   }
@@ -160,6 +162,8 @@ class FeedbackOption extends StatelessWidget {
 }
 
 class FeedbackPage extends StatelessWidget {
+  const FeedbackPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
@@ -181,8 +185,8 @@ class FeedbackPage extends StatelessWidget {
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             SizedBox(height: screenSize.height * 0.02),
-            TextField(
-              decoration: const InputDecoration(
+            const TextField(
+              decoration: InputDecoration(
                 labelText: 'Your feedback',
                 border: OutlineInputBorder(),
               ),
@@ -215,13 +219,15 @@ class FeedbackPage extends StatelessWidget {
 }
 
 class ContactEmailPage extends StatelessWidget {
+  const ContactEmailPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Contact by Email'),
       ),
-      body: Center(
+      body: const Center(
         child: Text('Email functionality is not implemented yet.'),
       ),
     );
@@ -229,13 +235,15 @@ class ContactEmailPage extends StatelessWidget {
 }
 
 class ContactPhonePage extends StatelessWidget {
+  const ContactPhonePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Contact by Phone'),
       ),
-      body: Center(
+      body: const Center(
         child: Text('Phone functionality is not implemented yet.'),
       ),
     );

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -74,8 +75,10 @@ class ProfilePage extends StatelessWidget {
                 ),
               );
             } catch (e) {
-              print('Error building profile page: $e');
-              return Center(child: Text('Error building profile page'));
+              if (kDebugMode) {
+                print('Error building profile page: $e');
+              }
+              return const Center(child: Text('Error building profile page'));
             }
           }
         },

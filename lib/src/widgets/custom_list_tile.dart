@@ -4,27 +4,27 @@ class CustomListTile extends StatelessWidget {
   final IconData icon;
   final String text;
 
-  CustomListTile({required this.icon, required this.text});
+  const CustomListTile({super.key, required this.icon, required this.text});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Column(
         children: <Widget>[
           Card(
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.0),
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Column(
                 children: <Widget>[
                   Row(
                     children: <Widget>[
                       Icon(icon, color: Colors.blue),
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
                       Text(text),
                     ],
                   ),
-                  Divider(
+                  const Divider(
                     height: 10,
                     color: Colors.grey,
                     indent: 20.0,
@@ -32,11 +32,11 @@ class CustomListTile extends StatelessWidget {
                   Row(
                     children: <Widget>[
                       Icon(icon, color: Colors.blue),
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
                       Text(text),
                     ],
                   ),
-                  Divider(
+                  const Divider(
                     height: 10,
                     color: Colors.grey,
                     indent: 20.0,
@@ -44,11 +44,11 @@ class CustomListTile extends StatelessWidget {
                   Row(
                     children: <Widget>[
                       Icon(icon, color: Colors.blue),
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
                       Text(text),
                     ],
                   ),
-                  Divider(
+                  const Divider(
                     height: 10,
                     color: Colors.grey,
                     indent: 20.0,
@@ -56,7 +56,7 @@ class CustomListTile extends StatelessWidget {
                   Row(
                     children: <Widget>[
                       Icon(icon, color: Colors.blue),
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
                       Text(text),
                     ],
                   ),

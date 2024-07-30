@@ -1,16 +1,27 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../models/food.dart';
 
 class BlogScreen extends StatelessWidget {
   const BlogScreen({super.key});
 
   Future<List<Food>> fetchFoods() async {
-    QuerySnapshot snapshot =
-        await FirebaseFirestore.instance.collection('foods').get();
-    return snapshot.docs.map((doc) => Food.fromFirestore(doc)).toList();
+    try {
+      QuerySnapshot snapshot =
+          await FirebaseFirestore.instance.collection('foods').get();
+      return snapshot.docs
+          .map((doc) => Food.fromFirestore(doc.data() as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching foods: $e');
+      }
+      rethrow;
+    }
   }
 
   @override
@@ -31,73 +42,98 @@ class BlogScreen extends StatelessWidget {
         builder: (ctx, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.error != null) {
+          } else if (snapshot.hasError) {
+            if (kDebugMode) {
+              print('Error in FutureBuilder: ${snapshot.error}');
+            }
             return const Center(child: Text('An error occurred!'));
           } else {
             final foods = snapshot.data ?? [];
-            return ListView.builder(
+            return GridView.builder(
+              padding: const EdgeInsets.all(10),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: 2 / 2.5,
+              ),
               itemCount: foods.length,
               itemBuilder: (ctx, index) {
                 final food = foods[index];
                 return Card(
-                  margin: const EdgeInsets.all(10),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15),
                   ),
                   elevation: 5,
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.all(10),
-                    leading: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: CachedNetworkImage(
-                        imageUrl: food.imageUrl,
-                        placeholder: (ctx, url) =>
-                            const CircularProgressIndicator(),
-                        errorWidget: (ctx, url, error) =>
-                            const Icon(Icons.error),
-                        height: 50,
-                        width: 50,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    title: Text(
-                      food.name,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Best time to eat: ${food.bestTimeToEat}',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontStyle: FontStyle.italic,
-                          ),
+                  child: Column(
+                    children: [
+                      ClipRRect(
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(15),
+                          topRight: Radius.circular(15),
                         ),
-                        Text(
-                          'Values: ${food.values}',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontStyle: FontStyle.italic,
-                          ),
+                        child: CachedNetworkImage(
+                          imageUrl: food.imageUrl,
+                          placeholder: (ctx, url) =>
+                              const CircularProgressIndicator(),
+                          errorWidget: (ctx, url, error) =>
+                              const Icon(Icons.error),
+                          height: 150,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
                         ),
-                      ],
-                    ),
-                    trailing: Text(
-                      'UGX${food.pricePerKg}@',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.green,
                       ),
-                    ),
-                    onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                        builder: (ctx) => FoodDetailScreen(foodId: food.id),
-                      ));
-                    },
+                      const SizedBox(height: 8),
+                      Text(
+                        food.name,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Best time to eat: ${food.bestTimeToEat}',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontStyle: FontStyle.italic,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      Text(
+                        'Values: ${food.values}',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontStyle: FontStyle.italic,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'UGX ${food.pricePerKg.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.green,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const Spacer(),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.deepOrange,
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (ctx) => FoodDetailScreen(
+                              foodId: food.id,
+                              foodItems: const [],
+                            ),
+                          ));
+                        },
+                        child: const Text('View Details'),
+                      ),
+                    ],
                   ),
                 );
               },
@@ -132,6 +168,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
   String _bestTimeToEat = '';
   double _pricePerKg = 0.0;
   String _imageUrl = '';
+  final double _restaurantPhoneNumber = 0.0;
 
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
@@ -145,6 +182,12 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
         bestTimeToEat: _bestTimeToEat,
         pricePerKg: _pricePerKg,
         imageUrl: _imageUrl,
+        price:
+            _pricePerKg, // Assuming price is same as pricePerKg for simplicity
+        restaurantName: '', // Add default or input values if needed
+        //
+        restaurantPhoneNumber:
+            _restaurantPhoneNumber, // Add default or input values if needed
       );
       await _db.collection('foods').add({
         'name': newFood.name,
@@ -152,6 +195,9 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
         'bestTimeToEat': newFood.bestTimeToEat,
         'pricePerKg': newFood.pricePerKg,
         'imageUrl': newFood.imageUrl,
+        'price': newFood.price,
+        'restaurantName': newFood.restaurantName,
+        'restaurantPhoneNumber': newFood.restaurantPhoneNumber,
       });
       // ignore: use_build_context_synchronously
       Navigator.of(context).pop();
@@ -277,7 +323,8 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
 class FoodDetailScreen extends StatelessWidget {
   final String foodId;
 
-  const FoodDetailScreen({super.key, required this.foodId});
+  const FoodDetailScreen(
+      {super.key, required this.foodId, required List<dynamic> foodItems});
 
   @override
   Widget build(BuildContext context) {
@@ -307,7 +354,8 @@ class FoodDetailScreen extends StatelessWidget {
         } else if (!snapshot.hasData || !snapshot.data!.exists) {
           return const Center(child: Text('Food not found!'));
         } else {
-          final food = Food.fromFirestore(snapshot.data!);
+          final food =
+              Food.fromFirestore(snapshot.data!.data() as Map<String, dynamic>);
 
           return Scaffold(
             appBar: AppBar(
@@ -403,36 +451,6 @@ class FoodDetailScreen extends StatelessWidget {
           );
         }
       },
-    );
-  }
-}
-
-class Food {
-  final String id;
-  final String name;
-  final String values;
-  final String bestTimeToEat;
-  final double pricePerKg;
-  final String imageUrl;
-
-  Food({
-    required this.id,
-    required this.name,
-    required this.values,
-    required this.bestTimeToEat,
-    required this.pricePerKg,
-    required this.imageUrl,
-  });
-
-  factory Food.fromFirestore(DocumentSnapshot doc) {
-    Map data = doc.data() as Map;
-    return Food(
-      id: doc.id,
-      name: data['name'] ?? '',
-      values: data['values'] ?? '',
-      bestTimeToEat: data['bestTimeToEat'] ?? '',
-      pricePerKg: (data['pricePerKg'] ?? 0).toDouble(),
-      imageUrl: data['imageUrl'] ?? '',
     );
   }
 }

@@ -7,7 +7,6 @@ class FavoritesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController searchController = TextEditingController();
 
     return ChangeNotifierProvider(
       create: (_) => FavoritesState(FavoritesRepositoryImpl())..loadFavorites(),

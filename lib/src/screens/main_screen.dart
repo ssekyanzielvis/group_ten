@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:food_dash/src/pages/food_provider.dart';
-import 'package:food_dash/src/pages/welcome_page_ui.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../pages/profile_page.dart';
@@ -11,6 +10,7 @@ import '../pages/register_restaurant_page.dart';
 import '../pages/bugdet.dart';
 import '../pages/calculator.dart';
 import '../pages/help.dart';
+import '../pages/home.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -29,7 +29,7 @@ class _MainScreenState extends State<MainScreen> {
   late List<Widget> pages;
   late Widget currentPage;
 
-  late WelcomePage homePage;
+  late HomePage homePage;
   late BlogScreen blogScreen;
   late HelpPage helpPage;
   late ProfilePage profilePage;
@@ -39,7 +39,7 @@ class _MainScreenState extends State<MainScreen> {
     super.initState();
 
     // Initialize pages
-    homePage = const WelcomePage();
+    homePage = const HomePage();
     blogScreen = const BlogScreen(); // Initialize BlogScreen
     helpPage = const HelpPage();
     profilePage = const ProfilePage();

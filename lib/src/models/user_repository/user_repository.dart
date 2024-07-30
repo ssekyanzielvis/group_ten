@@ -1,5 +1,6 @@
 //import 'dart:nativewrappers/_internal/vm/lib/core_patch.dart';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 //import 'package:vm_service/vm_service.dart';
@@ -29,7 +30,9 @@ class UserRepository extends GetxController {
         backgroundColor: Colors.red.withOpacity(0.1),
         colorText: Colors.blue,
       );
-      print(error.toString());
+      if (kDebugMode) {
+        print(error.toString());
+      }
     }
   }
 }

@@ -10,6 +10,7 @@ import '../pages/messages_reply.dart';
 import 'calculator.dart';
 // ignore: depend_on_referenced_packages
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../models/food.dart';
 
 class BudgetScreen extends StatelessWidget {
   final TextEditingController _budgetController = TextEditingController();
@@ -487,34 +488,34 @@ class FirestoreService {
         .collection('foods')
         .where('price', isLessThanOrEqualTo: budget)
         .get();
-    return querySnapshot.docs
-        .map((doc) => Food.fromFirestore(doc.data()))
-        .toList();
+    return querySnapshot.docs.map((doc) => Food.fromDocument(doc)).toList();
   }
 }
 
-class Food {
+/*class Food {
   final String name;
   final double price;
+  final String imageUrl;
   final String restaurantName;
-
-  String restaurantPhoneNumber;
+  final String restaurantPhoneNumber;
 
   Food(
       {required this.name,
       required this.price,
+      required this.imageUrl,
       required this.restaurantName,
       required this.restaurantPhoneNumber});
 
   factory Food.fromFirestore(Map<String, dynamic> data) {
     return Food(
       name: data['name'],
-      price: data['price'],
+      price: data['price'] ?? 0.0,
+      imageUrl: data.containsKey('imageUrl') ? data['imageUrl'] ?? '' : '',
       restaurantName: data['restaurantName'],
-      restaurantPhoneNumber: '',
+      restaurantPhoneNumber: data['restaurantPhoneNumber'] ?? '',
     );
   }
-}
+}*/
 
 class PaymentScreen extends StatelessWidget {
   final Food food;
@@ -536,9 +537,11 @@ class PaymentScreen extends StatelessWidget {
 
   void _processMobilePayment(BuildContext context, bool isCashIn) async {
     if (isCashIn) {
-      await _paymentService.cashIn(food.price, food.restaurantPhoneNumber);
+      await _paymentService.cashIn(food.price.toString() as double,
+          food.restaurantPhoneNumber as String);
     } else {
-      await _paymentService.cashOut(food.price, food.restaurantPhoneNumber);
+      await _paymentService.cashOut(food.price.toString() as double,
+          food.restaurantPhoneNumber as String);
     }
 
     ScaffoldMessenger.of(context).showSnackBar(

@@ -143,3 +143,17 @@ if(NOT CMAKE_BUILD_TYPE MATCHES "Debug")
   install(FILES "${AOT_LIBRARY}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
     COMPONENT Runtime)
 endif()
+# Add the firebase_core dependency
+set(FIREBASE_CORE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/flutter/ephemeral/.plugin_symlinks/firebase_core/windows")
+add_subdirectory(${FIREBASE_CORE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/firebase_core)
+
+# Add the google_sign_in dependency
+set(GOOGLE_SIGN_IN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/flutter/ephemeral/.plugin_symlinks/google_sign_in/windows")
+add_subdirectory(${GOOGLE_SIGN_IN_DIR} ${CMAKE_CURRENT_BINARY_DIR}/google_sign_in)
+
+# Add the flutter_facebook_auth dependency
+set(FLUTTER_FACEBOOK_AUTH_DIR "${CMAKE_CURRENT_SOURCE_DIR}/flutter/ephemeral/.plugin_symlinks/flutter_facebook_auth/windows")
+add_subdirectory(${FLUTTER_FACEBOOK_AUTH_DIR} ${CMAKE_CURRENT_BINARY_DIR}/flutter_facebook_auth)
+set(APPLICATION_ICON "${CMAKE_CURRENT_SOURCE_DIR}/runner/resources/app_icon.ico")
+
+

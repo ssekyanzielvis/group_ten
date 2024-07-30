@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+// ignore: library_prefixes
 import '../models/user_model.dart' as UserModel;
 import 'package:firebase_storage/firebase_storage.dart';
 
@@ -80,10 +82,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             .doc(user.uid)
             .set(userProfile.toMap());
 
+        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text('Profile updated successfully'),
         ));
 
+        // ignore: use_build_context_synchronously
         Navigator.pop(context);
       }
     }
@@ -91,23 +95,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   String? imageUrl = '';
 
-  Future<String?> _uploadImageToFirebase() async {
-    String imageUrl = '';
-
-    if (_profileImage != null) {
-      try {
-        Reference ref = FirebaseStorage.instance.ref().child(
-            'user_profile_images/${DateTime.now().millisecondsSinceEpoch}');
-        UploadTask uploadTask = ref.putFile(_profileImage!);
-        TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() {});
-        imageUrl = await taskSnapshot.ref.getDownloadURL();
-      } catch (e) {
-        print('Error uploading image to Firebase Storage: $e');
-      }
-    }
-
-    return imageUrl;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -261,7 +248,9 @@ class _ProfileImageUpdaterState extends State<ProfileImageUpdater> {
       if (pickedFile != null) {
         _image = File(pickedFile.path);
       } else {
-        print('No image selected.');
+        if (kDebugMode) {
+          print('No image selected.');
+        }
       }
     });
 

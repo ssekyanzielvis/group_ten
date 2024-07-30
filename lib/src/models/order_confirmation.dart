@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class OrderConfirmationScreen extends StatelessWidget {
@@ -54,8 +55,10 @@ class OrderConfirmationScreen extends StatelessWidget {
                       double budget = 20.0; // Example budget
 
                       // Implement final order logic here
-                      print(
+                      if (kDebugMode) {
+                        print(
                           'Order confirmed for $mealType at $restaurant within budget of \$$budget');
+                      }
 
                       // Navigate back to home screen
                       Navigator.pop(

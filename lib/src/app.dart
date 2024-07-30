@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+//import 'package:food_dash/src/pages/home.dart';
 import 'screens/main_screen.dart';
 import 'screens/login_screen.dart';
 import 'widgets/auth_service.dart';
 import 'screens/signup_screen.dart';
-
+//import 'pages/bugdet.dart';
 
 class App extends StatelessWidget {
-  const App({Key? key}) : super(key: key);
+  const App({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -31,9 +32,10 @@ class App extends StatelessWidget {
 }
 
 class WidgetTree extends StatefulWidget {
-  const WidgetTree({Key? key}) : super(key: key);
+  const WidgetTree({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _WidgetTreeState createState() => _WidgetTreeState();
 }
 

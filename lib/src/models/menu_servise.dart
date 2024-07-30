@@ -1,5 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'menu_item.dart';
 import 'dart:io';
@@ -21,7 +22,9 @@ class MenuService {
       // Save menu item to Firebase Realtime Database
       await _database.push().set(menuItem.toJson());
     } catch (e) {
-      print('Error adding menu item: $e');
+      if (kDebugMode) {
+        print('Error adding menu item: $e');
+      }
       rethrow;
     }
   }
@@ -35,7 +38,9 @@ class MenuService {
       TaskSnapshot snapshot = await uploadTask;
       return await snapshot.ref.getDownloadURL();
     } catch (e) {
-      print('Error uploading image: $e');
+      if (kDebugMode) {
+        print('Error uploading image: $e');
+      }
       return null;
     }
   }
@@ -52,7 +57,9 @@ class MenuService {
       }
       return menuItems;
     } catch (e) {
-      print('Error fetching menu items: $e');
+      if (kDebugMode) {
+        print('Error fetching menu items: $e');
+      }
       rethrow;
     }
   }
@@ -63,7 +70,9 @@ class MenuService {
       if (pickedFile == null) return null;
       return File(pickedFile.path);
     } catch (e) {
-      print('Error picking image: $e');
+      if (kDebugMode) {
+        print('Error picking image: $e');
+      }
       return null;
     }
   }

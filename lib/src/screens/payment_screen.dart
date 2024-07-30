@@ -5,12 +5,12 @@ class PaymentPage extends StatefulWidget {
   const PaymentPage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _PaymentPageState createState() => _PaymentPageState();
 }
 
 class _PaymentPageState extends State<PaymentPage> {
   Token? _paymentToken;
-  PaymentMethod? _paymentMethod;
   String? _error;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final CreditCard testCard = CreditCard(
@@ -59,13 +59,13 @@ class _PaymentPageState extends State<PaymentPage> {
                   CardFormPaymentRequest(),
                 ).then((paymentMethod) {
                   setState(() {
-                    _paymentMethod = paymentMethod;
                   });
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Received ${paymentMethod.id}'),
                     ),
                   );
+                // ignore: invalid_return_type_for_catch_error
                 }).catchError(setError);
               },
               child: const Text('Pay with Card'),

@@ -1,0 +1,7 @@
+target 'Runner' do
+    use_frameworks!
+    use_modular_headers!
+  
+    pod 'Firebase/Core'
+  end
+  

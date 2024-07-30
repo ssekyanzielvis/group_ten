@@ -7,7 +7,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  if (kIsWeb) {
+  {
     await Firebase.initializeApp(
         options: const FirebaseOptions(
             apiKey: "AIzaSyDwsK44BBlWnncq9HF1U_e2LS98DOpRNoo",
