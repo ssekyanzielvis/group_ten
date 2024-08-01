@@ -4,9 +4,9 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 // ignore: library_prefixes
 import '../models/user_model.dart' as UserModel;
-import 'package:firebase_storage/firebase_storage.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -20,22 +20,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _photoUrlController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
   final TextEditingController _dobController = TextEditingController();
   File? _profileImage;
-  final String _uploadedImageUrl = '';
-
-  Future<void> _pickImage() async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _profileImage = File(pickedFile.path);
-      });
-    }
-  }
+  String _uploadedImageUrl = '';
 
   @override
   void initState() {
@@ -55,10 +44,36 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             UserModel.User.fromMap(userData.data() as Map<String, dynamic>);
         _nameController.text = userProfile.name;
         _emailController.text = userProfile.email;
-        _photoUrlController.text = userProfile.photoUrl;
-        _dobController.text = userProfile.dob; // Add this line
+        _dobController.text = userProfile.dob;
         _locationController.text = userProfile.location;
         _phoneController.text = userProfile.phoneNumber;
+        _uploadedImageUrl = userProfile.photoUrl;
+      }
+    }
+  }
+
+  Future<void> _pickImage() async {
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _profileImage = File(pickedFile.path);
+      });
+    }
+  }
+
+  Future<void> _uploadFile() async {
+    if (_profileImage != null) {
+      try {
+        String filePath = 'profile_images/${DateTime.now()}.png';
+        FirebaseStorage storage = FirebaseStorage.instance;
+        Reference ref = storage.ref().child(filePath);
+        await ref.putFile(_profileImage!);
+        _uploadedImageUrl = await ref.getDownloadURL();
+      } catch (e) {
+        if (kDebugMode) {
+          print('Error uploading file: $e');
+        }
       }
     }
   }
@@ -67,12 +82,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (_formKey.currentState!.validate()) {
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
+        await _uploadFile();
+
         UserModel.User userProfile = UserModel.User(
           uid: user.uid,
           name: _nameController.text,
           email: _emailController.text,
-          photoUrl: imageUrl ?? _uploadedImageUrl,
-          dob: _dobController.text, // Add this line
+          photoUrl: _uploadedImageUrl,
+          dob: _dobController.text,
           location: _locationController.text,
           phoneNumber: _phoneController.text,
         );
@@ -93,8 +110,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
-  String? imageUrl = '';
-
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _locationController.dispose();
+    _dobController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -118,9 +142,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     radius: 50,
                     backgroundImage: _profileImage != null
                         ? FileImage(_profileImage!)
-                        : null,
+                        : _uploadedImageUrl.isNotEmpty
+                            ? NetworkImage(_uploadedImageUrl)
+                            : null,
                     backgroundColor: Colors.grey.shade300,
-                    child: _profileImage == null
+                    child: _profileImage == null && _uploadedImageUrl.isEmpty
                         ? const Icon(Icons.add_a_photo,
                             size: 50, color: Colors.white)
                         : null,
@@ -209,96 +235,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         }
         return null;
       },
-    );
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    _photoUrlController.dispose();
-    _phoneController.dispose();
-    _locationController.dispose();
-    _dobController.dispose();
-    super.dispose();
-  }
-}
-
-class ProfileImageUpdater extends StatefulWidget {
-  const ProfileImageUpdater({super.key, required this.userProfile});
-  final User userProfile;
-
-  @override
-  // ignore: library_private_types_in_public_api
-  _ProfileImageUpdaterState createState() => _ProfileImageUpdaterState();
-}
-
-class _ProfileImageUpdaterState extends State<ProfileImageUpdater> {
-  File? _image;
-  String? _downloadURL;
-  final picker = ImagePicker();
-  final FirebaseStorage storage = FirebaseStorage.instance;
-  final FirebaseFirestore firestore = FirebaseFirestore.instance;
-
-  Future<void> _pickImage() async {
-    // ignore: deprecated_member_use
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
-
-    setState(() {
-      if (pickedFile != null) {
-        _image = File(pickedFile.path);
-      } else {
-        if (kDebugMode) {
-          print('No image selected.');
-        }
-      }
-    });
-
-    if (_image != null) {
-      await _uploadImage();
-    }
-  }
-
-  Future<void> _uploadImage() async {
-    String userId = "user_id"; // Replace with the actual user ID
-    Reference storageReference =
-        storage.ref().child('profile_images/$userId.jpg');
-    UploadTask uploadTask = storageReference.putFile(_image!);
-
-    await uploadTask.whenComplete(() => null);
-
-    storageReference.getDownloadURL().then((fileURL) {
-      setState(() {
-        _downloadURL = fileURL;
-      });
-
-      _updateFirestore(fileURL);
-    });
-  }
-
-  Future<void> _updateFirestore(String fileURL) async {
-    String userId = "user_id"; // Replace with the actual user ID
-    await firestore.collection('users').doc(userId).update({
-      'photoUrl': fileURL,
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        CircleAvatar(
-          radius: 50,
-          backgroundImage: _downloadURL != null
-              ? NetworkImage(_downloadURL!)
-              : const AssetImage('lib/assets/default.jpg') as ImageProvider,
-          backgroundColor: Colors.grey.shade300,
-        ),
-        ElevatedButton(
-          onPressed: _pickImage,
-          child: const Text('Update Profile Image'),
-        ),
-      ],
     );
   }
 }

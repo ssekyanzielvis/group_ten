@@ -14,8 +14,19 @@ class BlogScreen extends StatelessWidget {
       QuerySnapshot snapshot =
           await FirebaseFirestore.instance.collection('foods').get();
       return snapshot.docs
-          .map((doc) => Food.fromFirestore(doc.data() as Map<String, dynamic>))
-          .toList();
+          .map((doc) {
+            final data =
+                doc.data() as Map<String, dynamic>?; // Ensure data is not null
+            if (data == null) {
+              if (kDebugMode) {
+                print('Null data found in document with ID: ${doc.id}');
+              }
+              return null; // Skip this document
+            }
+            return Food.fromDocument(doc);
+          })
+          .whereType<Food>()
+          .toList(); // Remove null values from the list
     } catch (e) {
       if (kDebugMode) {
         print('Error fetching foods: $e');
@@ -49,6 +60,9 @@ class BlogScreen extends StatelessWidget {
             return const Center(child: Text('An error occurred!'));
           } else {
             final foods = snapshot.data ?? [];
+            if (foods.isEmpty) {
+              return const Center(child: Text('No food items found.'));
+            }
             return GridView.builder(
               padding: const EdgeInsets.all(10),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -78,7 +92,7 @@ class BlogScreen extends StatelessWidget {
                               const CircularProgressIndicator(),
                           errorWidget: (ctx, url, error) =>
                               const Icon(Icons.error),
-                          height: 150,
+                          height: 430,
                           width: double.infinity,
                           fit: BoxFit.cover,
                         ),
@@ -168,7 +182,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
   String _bestTimeToEat = '';
   double _pricePerKg = 0.0;
   String _imageUrl = '';
-  final double _restaurantPhoneNumber = 0.0;
+  double _restaurantPhoneNumber = 0.0; // Updated to double
 
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
@@ -185,9 +199,8 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
         price:
             _pricePerKg, // Assuming price is same as pricePerKg for simplicity
         restaurantName: '', // Add default or input values if needed
-        //
         restaurantPhoneNumber:
-            _restaurantPhoneNumber, // Add default or input values if needed
+            _restaurantPhoneNumber, // Updated to use the parsed value
       );
       await _db.collection('foods').add({
         'name': newFood.name,
@@ -289,28 +302,24 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
                   ),
                 ),
                 keyboardType: TextInputType.url,
+                textInputAction: TextInputAction.done,
                 onSaved: (value) {
                   _imageUrl = value!;
                 },
               ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _saveForm,
-                style: ElevatedButton.styleFrom(
-                  iconColor: Colors.green,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 30,
-                    vertical: 15,
-                  ),
-                  textStyle: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+              const SizedBox(height: 10),
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: 'Restaurant Phone Number',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
                   ),
                 ),
-                child: const Text('Save'),
+                keyboardType: TextInputType.number,
+                textInputAction: TextInputAction.done,
+                onSaved: (value) {
+                  _restaurantPhoneNumber = double.parse(value!);
+                },
               ),
             ],
           ),
@@ -349,13 +358,12 @@ class FoodDetailScreen extends StatelessWidget {
       builder: (ctx, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.error != null) {
+        } else if (snapshot.hasError) {
           return const Center(child: Text('An error occurred!'));
         } else if (!snapshot.hasData || !snapshot.data!.exists) {
           return const Center(child: Text('Food not found!'));
         } else {
-          final food =
-              Food.fromFirestore(snapshot.data!.data() as Map<String, dynamic>);
+          final food = Food.fromDocument(snapshot.data!);
 
           return Scaffold(
             appBar: AppBar(
@@ -374,9 +382,8 @@ class FoodDetailScreen extends StatelessWidget {
                 children: [
                   CachedNetworkImage(
                     imageUrl: food.imageUrl,
-                    placeholder: (ctx, url) => const Center(
-                      child: CircularProgressIndicator(),
-                    ),
+                    placeholder: (ctx, url) =>
+                        const Center(child: CircularProgressIndicator()),
                     errorWidget: (ctx, url, error) => const Icon(Icons.error),
                     width: double.infinity,
                     height: 250,

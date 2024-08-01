@@ -2,10 +2,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
-
 import '../models/restaurant_model.dart';
 import '../pages/bugdet.dart';
-import 'calculator.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class RegisterRestaurantPage extends StatefulWidget {
   const RegisterRestaurantPage({super.key});
@@ -201,201 +202,371 @@ class RestaurantHomePage extends StatefulWidget {
 }
 
 class _RestaurantHomePageState extends State<RestaurantHomePage> {
-  final _formKey = GlobalKey<FormState>();
-  late String _foodName, _price;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Restaurant Home Page'),
+        backgroundColor: Colors.deepOrange,
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const NotificationScreen()),
-                );
-              },
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.deepOrange,
-                  borderRadius: BorderRadius.circular(8),
+          TextButton.icon(
+            icon: Stack(
+              children: [
+                const Icon(
+                  Icons.notifications,
+                  color: Colors.white,
                 ),
-                child: const Row(
-                  children: [
-                    Icon(Icons.notifications, color: Colors.white),
-                    SizedBox(width: 8),
-                    Text(
-                      'View Notifications',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
+                Positioned(
+                  right: 0,
+                  child: Container(
+                    padding: const EdgeInsets.all(1),
+                    decoration: const BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.all(Radius.circular(6)),
                     ),
-                  ],
+                    constraints: const BoxConstraints(
+                      minWidth: 12,
+                      minHeight: 12,
+                    ),
+                    child: const Text(
+                      '1', // Adjust this part as per your logic to show the notification count
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 8,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
+            label: const Text(
+              'View Notifications',
+              style: TextStyle(color: Colors.white),
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const NotificationScreen(),
+                ),
+              );
+            },
           ),
         ],
       ),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('restaurants')
+            .doc(widget.restaurantId)
+            .collection('foods')
+            .where('restaurantName',
+                isEqualTo: widget.restaurantId) // Filtering by restaurantName
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return GridView.builder(
+              padding: const EdgeInsets.all(10.0),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 2 / 3,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+              ),
+              itemCount: snapshot.data!.docs.length,
+              itemBuilder: (context, index) {
+                DocumentSnapshot food = snapshot.data!.docs[index];
+                return Card(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      food['imageUrl'] != null
+                          ? Image.network(
+                              food['imageUrl'],
+                              height: 100,
+                              fit: BoxFit.cover,
+                            )
+                          : Container(height: 100),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              food['foodName'],
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              'UGX ${food['price']}',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.deepOrange,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          } else {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        },
+      ),
+      bottomNavigationBar: BottomAppBar(
+        color: Colors.deepOrange,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: TextButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AddFoodPage(
+                    restaurantId: widget.restaurantId,
+                  ),
+                ),
+              );
+            },
+            child: const Text(
+              'Add Food',
+              style: TextStyle(color: Colors.white, fontSize: 16),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class AddFoodPage extends StatefulWidget {
+  final String restaurantId;
+
+  const AddFoodPage({super.key, required this.restaurantId});
+
+  @override
+  // ignore: library_private_types_in_public_api
+  _AddFoodPageState createState() => _AddFoodPageState();
+}
+
+class _AddFoodPageState extends State<AddFoodPage> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _restaurantNameController =
+      TextEditingController();
+  final TextEditingController _restaurantPhoneController =
+      TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _priceController = TextEditingController();
+
+  File? _image;
+  String? _downloadURL;
+
+  @override
+  void dispose() {
+    _restaurantNameController.dispose();
+    _restaurantPhoneController.dispose();
+    _nameController.dispose();
+    _priceController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pickImage() async {
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        if (kIsWeb) {
+          _image = File(pickedFile.path); // This will work only on Android/iOS
+        } else {
+          _image = File(pickedFile.path);
+        }
+      });
+
+      if (_image != null) {
+        await _uploadImage();
+      }
+    } else {
+      if (kDebugMode) {
+        print('No image selected.');
+      }
+    }
+  }
+
+  Future<void> _uploadImage() async {
+    try {
+      String filePath = 'uploads/${widget.restaurantId}/${DateTime.now()}.png';
+      Reference ref = FirebaseStorage.instance.ref().child(filePath);
+
+      UploadTask uploadTask = ref.putFile(_image!);
+
+      await uploadTask.whenComplete(() => null);
+      String downloadURL = await ref.getDownloadURL();
+
+      setState(() {
+        _downloadURL = downloadURL;
+      });
+
+      if (kDebugMode) {
+        print('File uploaded successfully. Download URL: $downloadURL');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error uploading file: $e');
+      }
+    }
+  }
+
+  Future<void> _saveFood() async {
+    if (_formKey.currentState!.validate() && _downloadURL != null) {
+      await FirebaseFirestore.instance
+          .collection('restaurants')
+          .doc(widget.restaurantId)
+          .collection('foods')
+          .add({
+        'restaurantName': _restaurantNameController.text,
+        'restaurantPhoneNumber': _restaurantPhoneController.text,
+        'foodName': _nameController.text,
+        'price': _priceController.text,
+        'imageUrl': _downloadURL,
+      });
+
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Food added successfully')),
+      );
+
+      _restaurantNameController.clear();
+      _restaurantPhoneController.clear();
+      _nameController.clear();
+      _priceController.clear();
+      setState(() {
+        _image = null;
+        _downloadURL = null;
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Please fill all fields and upload an image')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Add Food'),
+        backgroundColor: Colors.deepOrange, // Set the AppBar background color
+      ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: Column(
-          children: [
-            Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Food Name',
-                      border: OutlineInputBorder(),
-                      filled: true,
-                      fillColor: Colors.white,
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter a food name';
-                      }
-                      return null;
-                    },
-                    onSaved: (value) => _foodName = value!,
-                  ),
-                  const SizedBox(height: 20),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Price',
-                      border: OutlineInputBorder(),
-                      filled: true,
-                      fillColor: Colors.white,
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter a price';
-                      }
-                      return null;
-                    },
-                    onSaved: (value) => _price = value!,
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        _formKey.currentState!.save();
-                        // Save food to Firestore
-                        FirebaseFirestore.instance
-                            .collection('restaurants')
-                            .doc(widget.restaurantId)
-                            .collection('foods')
-                            .add({
-                          'name': _foodName,
-                          'price': _price,
-                        });
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 50,
-                        vertical: 15,
-                      ),
-                      iconColor: Colors.deepOrange,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: const Text('Add Food'),
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const CalculatorScreen()),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 50,
-                        vertical: 15,
-                      ),
-                      iconColor: Colors.deepPurple,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: const Text(
-                      'Make Calculations',
-                      style: TextStyle(color: Colors.blue, fontSize: 16),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            Expanded(
-              child: StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('restaurants')
-                    .doc(widget.restaurantId)
-                    .collection('foods')
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return ListView.builder(
-                      itemCount: snapshot.data!.docs.length,
-                      itemBuilder: (context, index) {
-                        DocumentSnapshot food = snapshot.data!.docs[index];
-                        return Container(
-                          margin: const EdgeInsets.symmetric(vertical: 8.0),
-                          padding: const EdgeInsets.all(16.0),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                spreadRadius: 2,
-                                blurRadius: 5,
-                                offset: const Offset(0, 3),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                food['name'],
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                'UGX ${food['price']}',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.deepOrange,
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    );
-                  } else {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              TextFormField(
+                controller: _restaurantNameController,
+                decoration: const InputDecoration(
+                  labelText: 'Restaurant Name',
+                  border: OutlineInputBorder(),
+                  filled: true,
+                  fillColor: Colors.white,
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter the restaurant name';
                   }
+                  return null;
                 },
               ),
-            ),
-          ],
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: _restaurantPhoneController,
+                decoration: const InputDecoration(
+                  labelText: 'Restaurant Phone Number',
+                  border: OutlineInputBorder(),
+                  filled: true,
+                  fillColor: Colors.white,
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter the restaurant phone number';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: _nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Food Name',
+                  border: OutlineInputBorder(),
+                  filled: true,
+                  fillColor: Colors.white,
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter the food name';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: _priceController,
+                decoration: const InputDecoration(
+                  labelText: 'Price',
+                  border: OutlineInputBorder(),
+                  filled: true,
+                  fillColor: Colors.white,
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter the price';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _pickImage,
+                style: ElevatedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                  backgroundColor: Colors.deepOrange,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: const Text('Upload Image'),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _saveFood,
+                style: ElevatedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                  backgroundColor: Colors.deepOrange,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: const Text(
+                  'Add Food',
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

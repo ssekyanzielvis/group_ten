@@ -17,6 +17,7 @@ class ProfilePage extends StatelessWidget {
           'Profile',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
         ),
+        backgroundColor: Colors.deepOrange,
       ),
       body: FutureBuilder<DocumentSnapshot>(
         future: _fetchUserData(),

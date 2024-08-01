@@ -1,16 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
-//import '../pages/register_restaurant_page.dart';
 import 'bugdet.dart';
-//import '../widgets/auth_service.dart';
-//import '../pages/calculator.dart';
-//import 'package:food_dash/src/pages/food_provider.dart';
-//import '../pages/profile_page.dart';
-//import '../pages/help.dart';
 import '../models/food.dart';
-//import 'package:firebase_messaging/firebase_messaging.dart';
-//import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../screens/login_screen.dart';
 
@@ -24,114 +16,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  List<QueryDocumentSnapshot> searchResults = [];
-  /*int newMessageCount = 0;
-  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
-  int currentTabIndex = 0;
-  late List<Widget> pages;
-  late Widget currentPage;
- 
-  late Widget homePage;
-  late BlogScreen blogScreen;
-  late HelpPage helpPage;
-  late ProfilePage profilePage;
-
-  @override
-  void initState() {
-    super.initState();
-
-    // Initialize pages
-    homePage = const HomePage();
-    blogScreen = const BlogScreen();
-    helpPage = const HelpPage();
-    profilePage = const ProfilePage();
-    pages = [
-      homePage,
-      blogScreen,
-      helpPage,
-      profilePage
-    ]; // Correctly assign the pages
-    currentPage = pages[0];
-
-    // Initialize Firebase Messaging
-    _firebaseMessaging.requestPermission();
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      if (kDebugMode) {
-        print('Received a message while in the foreground!');
-        print('Message data: ${message.data}');
-      }
-      if (message.notification != null) {
-        if (kDebugMode) {
-          print(
-              'Message also contained a notification: ${message.notification}');
-        }
-        _showNotification(
-            message.notification!.title!, message.notification!.body!);
-      }
-    });
-    _initializeNotifications();
-    _listenForMessages();
-  }
-
-  void _initializeNotifications() {
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-
-    const InitializationSettings initializationSettings =
-        InitializationSettings(
-      android: initializationSettingsAndroid,
-    );
-
-    flutterLocalNotificationsPlugin.initialize(initializationSettings);
-  }
-
-  void _showNotification(String title, String body) async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails('channel_id', 'channel_name',
-            importance: Importance.max,
-            priority: Priority.high,
-            showWhen: false);
-    const NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
-    await flutterLocalNotificationsPlugin.show(
-      0,
-      title,
-      body,
-      platformChannelSpecifics,
-      payload: 'item x',
-    );
-  }
-
-  void _listenForMessages() {
-    FirebaseFirestore.instance
-        .collection('messages')
-        .where('isRead', isEqualTo: false)
-        .snapshots()
-        .listen((snapshot) {
-      setState(() {
-        newMessageCount = snapshot.docs.length;
-      });
-    });
-  }*/
-
-  void _searchFoods(String query) async {
-    try {
-      final result = await _firestore
-          .collection('foods')
-          .where('name', isGreaterThanOrEqualTo: query)
-          .where('name', isLessThanOrEqualTo: '$query\uf8ff')
-          .get();
-
-      setState(() {
-        searchResults = result.docs;
-      });
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error searching foods: $e');
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -166,96 +50,6 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      /*drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            const DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.deepOrange,
-              ),
-              child: Text(
-                'Food Dash',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                ),
-              ),
-            ),
-            _createDrawerItem(
-                icon: Icons.home,
-                text: 'Home',
-                onTap: () {
-                  setState(() {
-                    currentTabIndex = 0;
-                    currentPage = pages[0];
-                  });
-                  Navigator.pop(context);
-                }),
-            _createDrawerItem(
-                icon: Icons.book,
-                text: 'Blog',
-                onTap: () {
-                  setState(() {
-                    currentTabIndex = 1;
-                    currentPage = pages[1];
-                  });
-                  Navigator.pop(context);
-                }),
-            _createDrawerItem(
-                icon: Icons.help,
-                text: 'Help',
-                onTap: () {
-                  setState(() {
-                    currentTabIndex = 2;
-                    currentPage = pages[2];
-                  });
-                  Navigator.pop(context);
-                }),
-            _createDrawerItem(
-                icon: Icons.person,
-                text: 'Profile',
-                onTap: () {
-                  setState(() {
-                    currentTabIndex = 3;
-                    currentPage = pages[3];
-                  });
-                  Navigator.pop(context);
-                }),
-            _createDrawerItem(
-                icon: Icons.message_sharp,
-                text: 'Messages',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const MessagesPage()),
-                  );
-                }),
-            _createDrawerItem(
-                icon: Icons.app_registration_rounded,
-                text: 'Register Restaurant',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const RegisterRestaurantPage()),
-                  );
-                }),
-            _createDrawerItem(
-                icon: Icons.calculate_rounded,
-                text: 'Calculator',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const CalculatorScreen(),
-                    ),
-                  );
-                }),
-          ],
-        ),
-      ),*/
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -368,26 +162,6 @@ class _HomePageState extends State<HomePage> {
                 },
               ),
             ),
-            if (searchResults.isNotEmpty)
-              Expanded(
-                child: ListView.builder(
-                  itemCount: searchResults.length,
-                  itemBuilder: (context, index) {
-                    var foodItem = searchResults[index];
-                    return ListTile(
-                      title: Text(foodItem['name']),
-                      subtitle: Text('Price: ${foodItem['price']}'),
-                      leading: foodItem.data() != null &&
-                              (foodItem.data() as Map<String, dynamic>)
-                                  .containsKey('imageUrl') &&
-                              foodItem['imageUrl'] != null
-                          ? Image.network(foodItem['imageUrl'])
-                          : null,
-                      onTap: () => _navigateToPaymentScreen(context, foodItem),
-                    );
-                  },
-                ),
-              ),
           ],
         ),
       ),
@@ -405,7 +179,7 @@ class _HomePageState extends State<HomePage> {
                     border: InputBorder.none,
                   ),
                   onSubmitted: (value) {
-                    _searchFoods(value);
+                    _navigateToSearchResultsPage(context, value);
                   },
                 ),
               ),
@@ -425,13 +199,11 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _navigateToPaymentScreen(
-      BuildContext context, QueryDocumentSnapshot foodSnapshot) {
-    Food food = Food.fromDocument(foodSnapshot);
+  void _navigateToSearchResultsPage(BuildContext context, String query) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => PaymentScreen(food: food),
+        builder: (context) => SearchResultsPage(query: query),
       ),
     );
   }
@@ -471,42 +243,73 @@ class FoodDetailPage extends StatelessWidget {
 
           final foodItems = snapshot.data!.docs;
 
-          return ListView.builder(
+          return GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 8.0,
+              mainAxisSpacing: 8.0,
+            ),
             itemCount: foodItems.length,
             itemBuilder: (context, index) {
               var foodItem = foodItems[index];
               return GestureDetector(
                 onTap: () => _navigateToPaymentScreen(context, foodItem),
                 child: Card(
-                  child: ListTile(
-                    leading: foodItem.data() != null &&
-                            (foodItem.data() as Map<String, dynamic>)
-                                .containsKey('imageUrl') &&
-                            foodItem['imageUrl'] != null &&
-                            foodItem['imageUrl'] is String
-                        ? Image.network(
-                            foodItem['imageUrl'],
-                            height: 50,
-                            width: 50,
-                            fit: BoxFit.cover,
-                          )
-                        : Container(
-                            height: 50,
-                            width: 50,
-                            color: Colors.grey,
-                            child: const Icon(
-                              Icons.fastfood,
-                              color: Colors.white,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      foodItem.data() != null &&
+                              (foodItem.data() as Map<String, dynamic>)
+                                  .containsKey('imageUrl') &&
+                              foodItem['imageUrl'] != null &&
+                              foodItem['imageUrl'] is String
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.circular(8.0),
+                              child: Image.network(
+                                foodItem['imageUrl'],
+                                height: 420,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                              ),
+                            )
+                          : Container(
+                              height: 420,
+                              width: double.infinity,
+                              color: Colors.grey,
+                              child: const Icon(
+                                Icons.fastfood,
+                                color: Colors.white,
+                              ),
                             ),
-                          ),
-                    title:
-                        foodItem['name'] != null && foodItem['name'] is String
-                            ? Text(foodItem['name'])
-                            : const Text('Unknown food name'),
-                    subtitle:
-                        foodItem['price'] != null && foodItem['price'] is int
-                            ? Text('Price: ${foodItem['price']}')
-                            : const Text('Price not available'),
+                      const SizedBox(height: 8.0),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Text(
+                          foodItem.data() != null &&
+                                  (foodItem.data() as Map<String, dynamic>)
+                                      .containsKey('name') &&
+                                  foodItem['name'] is String
+                              ? foodItem['name']
+                              : 'Unknown food name',
+                          style: const TextStyle(fontSize: 16.0),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      const SizedBox(height: 4.0),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Text(
+                          foodItem.data() != null &&
+                                  (foodItem.data() as Map<String, dynamic>)
+                                      .containsKey('price') &&
+                                  foodItem['price'] is int
+                              ? 'Price: ${foodItem['price']}'
+                              : 'Price not available',
+                          style: const TextStyle(fontSize: 14.0),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               );
@@ -669,6 +472,149 @@ class PaymentScreen extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class SearchResultsPage extends StatefulWidget {
+  final String query;
+
+  const SearchResultsPage({super.key, required this.query});
+
+  @override
+  // ignore: library_private_types_in_public_api
+  _SearchResultsPageState createState() => _SearchResultsPageState();
+}
+
+class _SearchResultsPageState extends State<SearchResultsPage> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  late Future<List<QueryDocumentSnapshot>> _searchResults;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchResults = _searchFoods(widget.query);
+  }
+
+  Future<List<QueryDocumentSnapshot>> _searchFoods(String query) async {
+    try {
+      final result = await _firestore
+          .collection('foods')
+          .where('name', isGreaterThanOrEqualTo: query)
+          .where('name', isLessThanOrEqualTo: '$query\uf8ff')
+          .get();
+      return result.docs;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error searching foods: $e');
+      }
+      return [];
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.deepOrange,
+        title: const Text('Search Results'),
+      ),
+      body: FutureBuilder<List<QueryDocumentSnapshot>>(
+        future: _searchResults,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No results found'));
+          }
+
+          final foodItems = snapshot.data!;
+
+          return GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 8.0,
+              mainAxisSpacing: 8.0,
+            ),
+            itemCount: foodItems.length,
+            itemBuilder: (context, index) {
+              var foodItem = foodItems[index];
+              return GestureDetector(
+                onTap: () =>
+                    _navigateToFoodDetailPage(context, foodItem['name']),
+                child: Card(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      foodItem.data() is Map<String, dynamic> &&
+                              (foodItem.data() as Map<String, dynamic>)
+                                  .containsKey('imageUrl') &&
+                              foodItem['imageUrl'] != null
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.circular(8.0),
+                              child: SizedBox(
+                                height: 420,
+                                width: double.infinity,
+                                child: Image.network(
+                                  foodItem['imageUrl'],
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (BuildContext context,
+                                      Object exception,
+                                      StackTrace? stackTrace) {
+                                    return Container(
+                                      height: 420,
+                                      width: double.infinity,
+                                      color: Colors.grey,
+                                      child: const Icon(
+                                        Icons.error,
+                                        color: Colors.white,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            )
+                          : Container(
+                              height: 100,
+                              width: double.infinity,
+                              color: Colors.grey,
+                              child: const Icon(
+                                Icons.fastfood,
+                                color: Colors.white,
+                              ),
+                            ),
+                      const SizedBox(height: 8.0),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Text(
+                          foodItem['name'],
+                          style: const TextStyle(fontSize: 16.0),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  void _navigateToFoodDetailPage(BuildContext context, String foodName) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FoodDetailPage(foodName: foodName),
       ),
     );
   }
