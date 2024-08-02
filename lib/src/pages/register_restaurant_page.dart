@@ -7,6 +7,7 @@ import '../pages/bugdet.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import '../models/food.dart';
 
 class RegisterRestaurantPage extends StatefulWidget {
   const RegisterRestaurantPage({super.key});
@@ -369,6 +370,8 @@ class _AddFoodPageState extends State<AddFoodPage> {
   File? _image;
   String? _downloadURL;
 
+  final FoodRepository _foodRepository = FoodRepository();
+
   @override
   void dispose() {
     _restaurantNameController.dispose();
@@ -384,11 +387,7 @@ class _AddFoodPageState extends State<AddFoodPage> {
 
     if (pickedFile != null) {
       setState(() {
-        if (kIsWeb) {
-          _image = File(pickedFile.path); // This will work only on Android/iOS
-        } else {
-          _image = File(pickedFile.path);
-        }
+        _image = File(pickedFile.path);
       });
 
       if (_image != null) {
@@ -427,31 +426,41 @@ class _AddFoodPageState extends State<AddFoodPage> {
 
   Future<void> _saveFood() async {
     if (_formKey.currentState!.validate() && _downloadURL != null) {
-      await FirebaseFirestore.instance
-          .collection('restaurants')
-          .doc(widget.restaurantId)
-          .collection('foods')
-          .add({
-        'restaurantName': _restaurantNameController.text,
-        'restaurantPhoneNumber': _restaurantPhoneController.text,
-        'foodName': _nameController.text,
-        'price': _priceController.text,
-        'imageUrl': _downloadURL,
-      });
-
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Food added successfully')),
+      final food = Food(
+        id: '', // Firestore will generate an ID
+        name: _nameController.text,
+        values: '', // Add default or additional values if needed
+        bestTimeToEat: '', // Add default or additional values if needed
+        pricePerKg: 0.0, // Add default or additional values if needed
+        imageUrl: _downloadURL!,
+        price: double.tryParse(_priceController.text) ?? 0.0,
+        restaurantName: _restaurantNameController.text,
+        restaurantPhoneNumber:
+            double.tryParse(_restaurantPhoneController.text) ?? 0.0,
       );
 
-      _restaurantNameController.clear();
-      _restaurantPhoneController.clear();
-      _nameController.clear();
-      _priceController.clear();
-      setState(() {
-        _image = null;
-        _downloadURL = null;
-      });
+      try {
+        await _foodRepository.addFood(widget.restaurantId, food);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Food added successfully')),
+        );
+
+        _restaurantNameController.clear();
+        _restaurantPhoneController.clear();
+        _nameController.clear();
+        _priceController.clear();
+        setState(() {
+          _image = null;
+          _downloadURL = null;
+        });
+      } catch (e) {
+        if (kDebugMode) {
+          print('Error saving food: $e');
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to add food')),
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -465,7 +474,7 @@ class _AddFoodPageState extends State<AddFoodPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add Food'),
-        backgroundColor: Colors.deepOrange, // Set the AppBar background color
+        backgroundColor: Colors.deepOrange,
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -536,6 +545,27 @@ class _AddFoodPageState extends State<AddFoodPage> {
                   return null;
                 },
               ),
+              const SizedBox(height: 20),
+              _downloadURL != null
+                  ? Image.network(
+                      _downloadURL!,
+                      height: 200,
+                      width: 200,
+                      fit: BoxFit.cover,
+                      errorBuilder: (BuildContext context, Object exception,
+                          StackTrace? stackTrace) {
+                        return Container(
+                          height: 200,
+                          width: 200,
+                          color: Colors.grey,
+                          child: const Icon(
+                            Icons.error,
+                            color: Colors.white,
+                          ),
+                        );
+                      },
+                    )
+                  : const Text('No image selected'),
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _pickImage,

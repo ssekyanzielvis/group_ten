@@ -82,55 +82,49 @@ class _HomePageState extends State<HomePage> {
                     itemCount: foodItems.length,
                     itemBuilder: (context, index) {
                       var foodItem = foodItems[index];
+                      final data = foodItem.data() as Map<String, dynamic>?;
                       return GestureDetector(
                         onTap: () => _navigateToFoodDetailPage(
-                            context, foodItem['name']),
+                            context, data?['name'] ?? 'Unknown food name'),
                         child: Card(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              foodItem.data() is Map<String, dynamic> &&
-                                      (foodItem.data() as Map<String, dynamic>)
-                                          .containsKey('imageUrl') &&
-                                      foodItem['imageUrl'] != null
+                              data != null &&
+                                      data.containsKey('imageUrl') &&
+                                      data['imageUrl'] != null
                                   ? ClipRRect(
-                                      borderRadius: BorderRadius.circular(
-                                          8.0), // Rounded corners
+                                      borderRadius: BorderRadius.circular(8.0),
                                       child: SizedBox(
-                                        height: 420, // Set the desired height
-                                        width: double
-                                            .infinity, // Make the image fill the width of the parent
-                                        child: Image.network(
-                                          foodItem['imageUrl'],
-                                          height:
-                                              420, // Match the height of the container
-                                          width: double
-                                              .infinity, // Match the width of the container
-                                          fit: BoxFit
-                                              .cover, // Make the image cover the entire container
-                                          errorBuilder: (BuildContext context,
-                                              Object exception,
-                                              StackTrace? stackTrace) {
-                                            return Container(
-                                              height:
-                                                  420, // Match the height of the container
-                                              width: double
-                                                  .infinity, // Match the width of the container
-                                              color: Colors.grey,
-                                              child: const Icon(
-                                                Icons.error,
-                                                color: Colors.white,
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ),
+                                          height: 450,
+                                          width: double.infinity,
+                                          child: Image.network(
+                                            data['imageUrl'] ?? '',
+                                            height: 450,
+                                            width: double.infinity,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (BuildContext context,
+                                                Object exception,
+                                                StackTrace? stackTrace) {
+                                              if (kDebugMode) {
+                                                print(
+                                                    'Image failed to load: $exception');
+                                              } // Debug print
+                                              return Container(
+                                                height: 450,
+                                                width: double.infinity,
+                                                color: Colors.grey,
+                                                child: const Icon(
+                                                  Icons.error,
+                                                  color: Colors.white,
+                                                ),
+                                              );
+                                            },
+                                          )),
                                     )
                                   : Container(
-                                      height:
-                                          420, // Set the same height as the image container
-                                      width: double
-                                          .infinity, // Make the placeholder fill the width of the parent
+                                      height: 450,
+                                      width: double.infinity,
                                       color: Colors.grey,
                                       child: const Icon(
                                         Icons.fastfood,
@@ -139,17 +133,14 @@ class _HomePageState extends State<HomePage> {
                                     ),
                               const SizedBox(height: 8.0),
                               Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal:
-                                        8.0), // Add some horizontal padding
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8.0),
                                 child: Container(
-                                  color: Colors
-                                      .white, // Optional: Set a background color for the text container
+                                  color: Colors.white,
                                   child: Text(
-                                    foodItem['name'],
+                                    data?['name'] ?? 'Unknown food name',
                                     style: const TextStyle(fontSize: 18.0),
-                                    textAlign: TextAlign
-                                        .center, // Center the text within the container
+                                    textAlign: TextAlign.center,
                                   ),
                                 ),
                               ),
