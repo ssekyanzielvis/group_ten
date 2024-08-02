@@ -31,9 +31,9 @@ class Food {
       name: data['name'] ?? '',
       values: data['values'] ?? '',
       bestTimeToEat: data['bestTimeToEat'] ?? '',
-      pricePerKg: (data['pricePerKg'] ?? 0.0).toDouble(),
+      pricePerKg: _convertToDouble(data['pricePerKg']),
       imageUrl: data['imageUrl'] ?? '',
-      price: (data['price'] ?? 0.0).toDouble(),
+      price: _convertToDouble(data['price']),
       restaurantName: data['restaurantName'] ?? '',
       restaurantPhoneNumber: _convertToDouble(data['restaurantPhoneNumber']),
     );
@@ -57,11 +57,9 @@ class Food {
       name: data['name'] ?? '',
       values: data['values'] ?? '',
       bestTimeToEat: data['bestTimeToEat'] ?? '',
-      pricePerKg: (data['pricePerKg'] ?? 0.0).toDouble(),
+      pricePerKg: _convertToDouble(data['pricePerKg']),
       imageUrl: data['imageUrl'] ?? '',
-      price: (data['price'] is int
-          ? (data['price'] as int).toDouble()
-          : (data['price'] as double? ?? 0.0)),
+      price: _convertToDouble(data['price']),
       restaurantName: data['restaurantName'] ?? '',
       restaurantPhoneNumber: _convertToDouble(data['restaurantPhoneNumber']),
     );

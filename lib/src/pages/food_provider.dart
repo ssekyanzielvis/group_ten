@@ -23,7 +23,23 @@ class BlogScreen extends StatelessWidget {
               }
               return null; // Skip this document
             }
-            return Food.fromDocument(doc);
+            return Food(
+              id: doc.id,
+              name: data['name'] ?? '',
+              values: data['values'] ?? '',
+              bestTimeToEat: data['bestTimeToEat'] ?? '',
+              pricePerKg: data['pricePerKg'] is String
+                  ? double.tryParse(data['pricePerKg']) ?? 0.0
+                  : (data['pricePerKg'] as num?)?.toDouble() ?? 0.0,
+              imageUrl: data['imageUrl'] ?? '',
+              price: data['price'] is String
+                  ? double.tryParse(data['price']) ?? 0.0
+                  : (data['price'] as num?)?.toDouble() ?? 0.0,
+              restaurantName: data['restaurantName'] ?? '',
+              restaurantPhoneNumber: data['restaurantPhoneNumber'] is String
+                  ? double.tryParse(data['restaurantPhoneNumber']) ?? 0.0
+                  : (data['restaurantPhoneNumber'] as num?)?.toDouble() ?? 0.0,
+            );
           })
           .whereType<Food>()
           .toList(); // Remove null values from the list
@@ -182,7 +198,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
   String _bestTimeToEat = '';
   double _pricePerKg = 0.0;
   String _imageUrl = '';
-  double _restaurantPhoneNumber = 0.0; // Updated to double
+  double _restaurantPhoneNumber = 0.0;
 
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
@@ -199,8 +215,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
         price:
             _pricePerKg, // Assuming price is same as pricePerKg for simplicity
         restaurantName: '', // Add default or input values if needed
-        restaurantPhoneNumber:
-            _restaurantPhoneNumber, // Updated to use the parsed value
+        restaurantPhoneNumber: _restaurantPhoneNumber,
       );
       await _db.collection('foods').add({
         'name': newFood.name,
