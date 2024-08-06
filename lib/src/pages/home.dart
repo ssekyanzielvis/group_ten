@@ -71,6 +71,7 @@ class _HomePageState extends State<HomePage> {
                   }
 
                   final foodItems = snapshot.data!.docs;
+                  final uniqueFoodItems = _removeDuplicateFoods(foodItems);
 
                   return GridView.builder(
                     gridDelegate:
@@ -79,9 +80,9 @@ class _HomePageState extends State<HomePage> {
                       crossAxisSpacing: 8.0,
                       mainAxisSpacing: 8.0,
                     ),
-                    itemCount: foodItems.length,
+                    itemCount: uniqueFoodItems.length,
                     itemBuilder: (context, index) {
-                      var foodItem = foodItems[index];
+                      var foodItem = uniqueFoodItems[index];
                       final data = foodItem.data() as Map<String, dynamic>?;
                       return GestureDetector(
                         onTap: () => _navigateToFoodDetailPage(
@@ -96,11 +97,11 @@ class _HomePageState extends State<HomePage> {
                                   ? ClipRRect(
                                       borderRadius: BorderRadius.circular(8.0),
                                       child: SizedBox(
-                                          height: 450,
+                                          height: 420,
                                           width: double.infinity,
                                           child: Image.network(
                                             data['imageUrl'] ?? '',
-                                            height: 450,
+                                            height: 420,
                                             width: double.infinity,
                                             fit: BoxFit.cover,
                                             errorBuilder: (BuildContext context,
@@ -111,7 +112,7 @@ class _HomePageState extends State<HomePage> {
                                                     'Image failed to load: $exception');
                                               } // Debug print
                                               return Container(
-                                                height: 450,
+                                                height: 420,
                                                 width: double.infinity,
                                                 color: Colors.grey,
                                                 child: const Icon(
@@ -123,7 +124,7 @@ class _HomePageState extends State<HomePage> {
                                           )),
                                     )
                                   : Container(
-                                      height: 450,
+                                      height: 150,
                                       width: double.infinity,
                                       color: Colors.grey,
                                       child: const Icon(
@@ -179,6 +180,22 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  List<QueryDocumentSnapshot<Object?>> _removeDuplicateFoods(
+      List<QueryDocumentSnapshot<Object?>> foodItems) {
+    final uniqueNames = <String>{};
+    final uniqueFoodItems = <QueryDocumentSnapshot<Object?>>[];
+
+    for (var item in foodItems) {
+      final data = item.data() as Map<String, dynamic>?;
+      final name = data?['name'] ?? '';
+      if (uniqueNames.add(name)) {
+        uniqueFoodItems.add(item);
+      }
+    }
+
+    return uniqueFoodItems;
   }
 
   void _navigateToFoodDetailPage(BuildContext context, String foodName) {
