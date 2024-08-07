@@ -229,13 +229,27 @@ class _RestaurantHomePageState extends State<RestaurantHomePage> {
                       minWidth: 12,
                       minHeight: 12,
                     ),
-                    child: const Text(
-                      '1', // Adjust this part as per your logic to show the notification count
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 8,
-                      ),
-                      textAlign: TextAlign.center,
+                    child: StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('notifications')
+                          .where('restaurantName',
+                              isEqualTo: widget.restaurantId)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData &&
+                            snapshot.data!.docs.isNotEmpty) {
+                          return Text(
+                            snapshot.data!.docs.length.toString(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 8,
+                            ),
+                            textAlign: TextAlign.center,
+                          );
+                        } else {
+                          return const SizedBox.shrink();
+                        }
+                      },
                     ),
                   ),
                 ),
@@ -249,78 +263,119 @@ class _RestaurantHomePageState extends State<RestaurantHomePage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const NotificationScreen(),
+                  builder: (context) =>
+                      const NotificationScreen(), // Replace with your NotificationScreen widget
                 ),
               );
             },
           ),
         ],
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('restaurants')
-            .doc(widget.restaurantId)
-            .collection('foods')
-            .where('restaurantName',
-                isEqualTo: widget.restaurantId) // Filtering by restaurantName
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return GridView.builder(
-              padding: const EdgeInsets.all(10.0),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 2 / 3,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-              ),
-              itemCount: snapshot.data!.docs.length,
-              itemBuilder: (context, index) {
-                DocumentSnapshot food = snapshot.data!.docs[index];
-                return Card(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      food['imageUrl'] != null
-                          ? Image.network(
-                              food['imageUrl'],
-                              height: 100,
-                              fit: BoxFit.cover,
-                            )
-                          : Container(height: 100),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
+      body: Column(
+        children: [
+          StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection('notifications')
+                .where('restaurantName', isEqualTo: widget.restaurantId)
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
+                return Expanded(
+                  flex: 1,
+                  child: ListView.builder(
+                    itemCount: snapshot.data!.docs.length,
+                    itemBuilder: (context, index) {
+                      DocumentSnapshot notification =
+                          snapshot.data!.docs[index];
+                      return ListTile(
+                        title: Text(notification['title'] ?? 'No Title'),
+                        subtitle: Text(notification['body'] ?? 'No Details'),
+                      );
+                    },
+                  ),
+                );
+              } else if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              } else {
+                return const SizedBox.shrink();
+              }
+            },
+          ),
+          Expanded(
+            flex: 2,
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('restaurants')
+                  .doc(widget.restaurantId)
+                  .collection('foods')
+                  .where('restaurantName', isEqualTo: widget.restaurantId)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    setState(() {
+                      // Triggering setState to update UI on the main thread
+                    });
+                  });
+                  return GridView.builder(
+                    padding: const EdgeInsets.all(10.0),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 2 / 3,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                    ),
+                    itemCount: snapshot.data!.docs.length,
+                    itemBuilder: (context, index) {
+                      DocumentSnapshot food = snapshot.data!.docs[index];
+                      return Card(
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Text(
-                              food['foodName'],
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              'UGX ${food['price']}',
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Colors.deepOrange,
+                            food['imageUrl'] != null
+                                ? Image.network(
+                                    food['imageUrl'],
+                                    height: 100,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Container(height: 100),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    food['foodName'],
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    'UGX ${food['price']}',
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.deepOrange,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         ),
-                      ),
-                    ],
-                  ),
-                );
+                      );
+                    },
+                  );
+                } else {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
               },
-            );
-          } else {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-        },
+            ),
+          ),
+        ],
       ),
       bottomNavigationBar: BottomAppBar(
         color: Colors.deepOrange,

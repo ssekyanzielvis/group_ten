@@ -229,6 +229,7 @@ class FoodDetailPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('$foodName Details'),
+        backgroundColor: Colors.deepOrange,
       ),
       body: StreamBuilder(
         stream: firestore
@@ -316,6 +317,15 @@ class FoodDetailPage extends StatelessWidget {
                           style: const TextStyle(fontSize: 14.0),
                           textAlign: TextAlign.center,
                         ),
+                      ),
+                      const SizedBox(height: 8.0),
+                      ElevatedButton(
+                        onPressed: () =>
+                            _navigateToPaymentScreen(context, foodItem),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.deepOrange,
+                        ),
+                        child: const Text('Make Order'),
                       ),
                     ],
                   ),
