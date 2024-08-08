@@ -228,7 +228,7 @@ class FoodDetailPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('$foodName Details'),
+        title: Text('Choose $foodName according to your budget.'),
         backgroundColor: Colors.deepOrange,
       ),
       body: StreamBuilder(
@@ -536,7 +536,7 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.deepOrange,
-        title: const Text('Search Results'),
+        title: const Text('Search Results '),
       ),
       body: FutureBuilder<List<QueryDocumentSnapshot>>(
         future: _searchResults,
