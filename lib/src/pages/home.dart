@@ -217,24 +217,32 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class FoodDetailPage extends StatelessWidget {
+class FoodDetailPage extends StatefulWidget {
   final String foodName;
 
   const FoodDetailPage({super.key, required this.foodName});
 
   @override
-  Widget build(BuildContext context) {
-    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  // ignore: library_private_types_in_public_api
+  _FoodDetailPageState createState() => _FoodDetailPageState();
+}
 
+class _FoodDetailPageState extends State<FoodDetailPage> {
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final Map<QueryDocumentSnapshot, int> selectedItems =
+      {}; // Map to store selected food items and their quantities
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Choose $foodName according to your budget.'),
+        title: Text('Choose ${widget.foodName} according to your budget.'),
         backgroundColor: Colors.deepOrange,
       ),
       body: StreamBuilder(
         stream: firestore
             .collection('foods')
-            .where('name', isEqualTo: foodName)
+            .where('name', isEqualTo: widget.foodName)
             .snapshots(),
         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -252,107 +260,206 @@ class FoodDetailPage extends StatelessWidget {
 
           final foodItems = snapshot.data!.docs;
 
-          return GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 8.0,
-              mainAxisSpacing: 8.0,
-            ),
-            itemCount: foodItems.length,
-            itemBuilder: (context, index) {
-              var foodItem = foodItems[index];
-              return GestureDetector(
-                onTap: () => _navigateToPaymentScreen(context, foodItem),
-                child: Card(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      foodItem.data() != null &&
-                              (foodItem.data() as Map<String, dynamic>)
-                                  .containsKey('imageUrl') &&
-                              foodItem['imageUrl'] != null &&
-                              foodItem['imageUrl'] is String
-                          ? ClipRRect(
-                              borderRadius: BorderRadius.circular(8.0),
-                              child: Image.network(
-                                foodItem['imageUrl'],
-                                height: 420,
-                                width: double.infinity,
-                                fit: BoxFit.cover,
-                              ),
-                            )
-                          : Container(
-                              height: 420,
-                              width: double.infinity,
-                              color: Colors.grey,
-                              child: const Icon(
-                                Icons.fastfood,
-                                color: Colors.white,
-                              ),
-                            ),
-                      const SizedBox(height: 8.0),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Text(
-                          foodItem.data() != null &&
-                                  (foodItem.data() as Map<String, dynamic>)
-                                      .containsKey('name') &&
-                                  foodItem['name'] is String
-                              ? foodItem['name']
-                              : 'Unknown food name',
-                          style: const TextStyle(fontSize: 16.0),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      const SizedBox(height: 4.0),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Text(
-                          foodItem.data() != null &&
-                                  (foodItem.data() as Map<String, dynamic>)
-                                      .containsKey('price') &&
-                                  foodItem['price'] is int
-                              ? 'Price: ${foodItem['price']}'
-                              : 'Price not available',
-                          style: const TextStyle(fontSize: 14.0),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      const SizedBox(height: 8.0),
-                      ElevatedButton(
-                        onPressed: () =>
-                            _navigateToPaymentScreen(context, foodItem),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.deepOrange,
-                        ),
-                        child: const Text('Make Order'),
-                      ),
-                    ],
+          return Column(
+            children: [
+              Expanded(
+                child: GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 8.0,
+                    mainAxisSpacing: 8.0,
                   ),
+                  itemCount: foodItems.length,
+                  itemBuilder: (context, index) {
+                    var foodItem = foodItems[index];
+                    return GestureDetector(
+                      onTap: () => _selectItem(foodItem),
+                      child: Card(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _buildFoodImage(foodItem),
+                            const SizedBox(height: 8.0),
+                            _buildFoodName(foodItem),
+                            const SizedBox(height: 4.0),
+                            _buildFoodPrice(foodItem),
+                            const SizedBox(height: 8.0),
+                            ElevatedButton(
+                              onPressed: () => _selectItem(foodItem),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.deepOrange,
+                              ),
+                              child: const Text('Add to Order'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
+              ),
+              _buildOrderSummary(),
+            ],
           );
         },
       ),
     );
   }
 
-  void _navigateToPaymentScreen(
-      BuildContext context, QueryDocumentSnapshot foodSnapshot) {
-    Food food = Food.fromDocument(foodSnapshot);
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PaymentScreen(food: food),
+  Widget _buildFoodImage(QueryDocumentSnapshot foodItem) {
+    return foodItem['imageUrl'] != null && foodItem['imageUrl'] is String
+        ? ClipRRect(
+            borderRadius: BorderRadius.circular(8.0),
+            child: Image.network(
+              foodItem['imageUrl'],
+              height: 420,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            ),
+          )
+        : Container(
+            height: 420,
+            width: double.infinity,
+            color: Colors.grey,
+            child: const Icon(
+              Icons.fastfood,
+              color: Colors.white,
+            ),
+          );
+  }
+
+  Widget _buildFoodName(QueryDocumentSnapshot foodItem) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: Text(
+        foodItem['name'] ?? 'Unknown food name',
+        style: const TextStyle(fontSize: 16.0),
+        textAlign: TextAlign.center,
       ),
     );
+  }
+
+  Widget _buildFoodPrice(QueryDocumentSnapshot foodItem) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: Text(
+        foodItem['price'] != null && foodItem['price'] is int
+            ? 'Price: ${foodItem['price']}'
+            : 'Price not available',
+        style: const TextStyle(fontSize: 14.0),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  void _selectItem(QueryDocumentSnapshot foodItem) {
+    setState(() {
+      if (selectedItems.containsKey(foodItem)) {
+        selectedItems[foodItem] = selectedItems[foodItem]! + 1;
+      } else {
+        selectedItems[foodItem] = 1;
+      }
+    });
+  }
+
+  Widget _buildOrderSummary() {
+    int totalCost = selectedItems.entries.fold<int>(
+      0,
+      // ignore: avoid_types_as_parameter_names
+      (sum, entry) {
+        final price =
+            (entry.key['price'] as num).toInt(); // Cast 'price' to int
+        return sum + (price * entry.value);
+      },
+    );
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          if (selectedItems.isNotEmpty) ...[
+            const Text(
+              'Order Summary',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            ...selectedItems.entries.map((entry) {
+              final foodName = entry.key['name'];
+              final foodQuantity = entry.value;
+              final foodPrice = entry.key['price'];
+              final itemTotal = foodPrice * foodQuantity;
+
+              return Text(
+                '$foodName x$foodQuantity = $itemTotal',
+              );
+            }),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () =>
+                  _navigateToPaymentScreen(context, selectedItems, totalCost),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepOrange,
+              ),
+              child: const Text('Proceed to Payment'),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  void _navigateToPaymentScreen(BuildContext context,
+      Map<QueryDocumentSnapshot, int> selectedItems, int totalCost) {
+    // Assuming you take the first selected item as the `Food` object
+    var firstItem = selectedItems.entries.first.key;
+
+    // Get the data from the document snapshot
+    var data = firstItem.data() as Map<String, dynamic>?;
+
+    // Check if the data is not null and all required fields exist
+    if (data != null &&
+        data.containsKey('restaurantName') &&
+        data.containsKey('restaurantPhoneNumber') &&
+        data.containsKey('pricePerKg') &&
+        data.containsKey('values') &&
+        data.containsKey('bestTimeToEat')) {
+      Food food = Food(
+        id: firstItem.id, // Assuming the document ID is the food ID
+        name: data['name'] as String,
+        values: data['values'] as String,
+        bestTimeToEat: data['bestTimeToEat'] as String,
+        pricePerKg: (data['pricePerKg'] as num).toDouble(),
+        imageUrl: data['imageUrl'] as String,
+        price: (data['price'] as num).toDouble(),
+        restaurantName: data['restaurantName'] as String,
+        restaurantPhoneNumber:
+            (data['restaurantPhoneNumber'] as num).toDouble(),
+      );
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PaymentScreen(
+            food: food, // Pass the `food` object
+            totalCost: totalCost,
+          ),
+        ),
+      );
+    } else {
+      // Handle the case where one or more fields are missing or data is null
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+              'Some required fields are missing for the selected food item.'),
+        ),
+      );
+    }
   }
 }
 
 class PaymentScreen extends StatelessWidget {
   final Food food;
-  PaymentScreen({super.key, required this.food});
+  PaymentScreen({super.key, required this.food, required int totalCost});
 
   final AirtelPaymentService _paymentService = AirtelPaymentService();
 

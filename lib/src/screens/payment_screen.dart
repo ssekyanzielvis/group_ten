@@ -58,14 +58,14 @@ class _PaymentPageState extends State<PaymentPage> {
                 StripePayment.paymentRequestWithCardForm(
                   CardFormPaymentRequest(),
                 ).then((paymentMethod) {
-                  setState(() {
-                  });
+                  setState(() {});
+                  // ignore: use_build_context_synchronously
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Received ${paymentMethod.id}'),
                     ),
                   );
-                // ignore: invalid_return_type_for_catch_error
+                  // ignore: invalid_return_type_for_catch_error
                 }).catchError(setError);
               },
               child: const Text('Pay with Card'),

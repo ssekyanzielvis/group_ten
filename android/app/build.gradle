@@ -1,16 +1,13 @@
 plugins {
     id "com.android.application"
-    //id "kotlin-android"
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id "dev.flutter.flutter-gradle-plugin"
-    //id 'kotlin-android'
     id 'com.google.gms.google-services'
-    
-    
+    // Uncomment if using Kotlin
+    // id "kotlin-android"
 }
 
-
-apply plugin: 'com.android.application'
+// Remove the duplicate plugin application
+// apply plugin: 'com.android.application'
 
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file("local.properties")
@@ -28,16 +25,17 @@ if (flutterVersionCode == null) {
 def flutterVersionName = localProperties.getProperty("flutter.versionName")
 if (flutterVersionName == null) {
     flutterVersionName = "1.0"
+}
+
 def keystoreProperties = new Properties()
 def keystorePropertiesFile = rootProject.file('key.properties')
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
-}
 
 android {
     namespace = "com.example.food_dash"
-    compileSdk = 35
+    compileSdk = 30
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -48,7 +46,7 @@ android {
     defaultConfig {
         applicationId = "com.example.food_dash"
         minSdk = 21
-        targetSdk = 35
+        targetSdk = 30
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
         multiDexEnabled = true
@@ -77,12 +75,14 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout'
     implementation 'com.facebook.android:facebook-android-sdk:latest.release'
     implementation 'com.google.firebase:firebase-storage'
-    // Move this line to the bottom of the dependencies block
+
+    // Ensure google-services is applied correctly
     implementation 'com.google.gms:google-services'
 }
 
 flutter {
-    source = "../.."
+    source = "F:\\flutter sdk\\flutter"
 }
 
+// Ensure the google-services plugin is only applied once
 apply plugin: 'com.google.gms.google-services'
